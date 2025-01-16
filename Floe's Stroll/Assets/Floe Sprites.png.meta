@@ -1,0 +1,640 @@
+fileFormatVersion: 2
+guid: f799f50f12cdba74ba950414c038215c
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Floe Sprites_0
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 929
+        width: 199
+        height: 246
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 852198a276580c047b6e5176a6097fea
+      internalID: -1883560130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_1
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 940
+        width: 162
+        height: 230
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d8add543b0a06245af6175a33fb8585
+      internalID: 1226087781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_2
+      rect:
+        serializedVersion: 2
+        x: 605
+        y: 943
+        width: 162
+        height: 228
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ddaa8c1681c592e4d91d8e54c6b87ee7
+      internalID: 1607056668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_3
+      rect:
+        serializedVersion: 2
+        x: 832
+        y: 943
+        width: 180
+        height: 227
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f37e80e9761bdd4e905d66c2f93f1dd
+      internalID: 1500803162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_4
+      rect:
+        serializedVersion: 2
+        x: 1084
+        y: 937
+        width: 184
+        height: 235
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a68603b1452080488d0f928c3092615
+      internalID: -983731803
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_6
+      rect:
+        serializedVersion: 2
+        x: 1350
+        y: 939
+        width: 165
+        height: 233
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d576f4b5aab27a4dab05a0bc3f87da8
+      internalID: 906511914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_8
+      rect:
+        serializedVersion: 2
+        x: 1607
+        y: 939
+        width: 166
+        height: 232
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b50a3959dd88f6f4b906def843b55554
+      internalID: 370128633
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_9
+      rect:
+        serializedVersion: 2
+        x: 1898
+        y: 937
+        width: 170
+        height: 250
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 788942b4f2453544ebb91244077f0f43
+      internalID: 559047138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_10
+      rect:
+        serializedVersion: 2
+        x: 2123
+        y: 941
+        width: 223
+        height: 222
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adf6b37e19a67c5499c15d07f25b440c
+      internalID: 1639232905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_13
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 642
+        width: 176
+        height: 247
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a570cb9e6f210a45a7229e88f175e1d
+      internalID: 2078624476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_15
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 649
+        width: 204
+        height: 229
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2bfc877bec2144c4b91889f868b76dfc
+      internalID: 1511756453
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_16
+      rect:
+        serializedVersion: 2
+        x: 833
+        y: 655
+        width: 213
+        height: 227
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb9af0d3e434e184f8abb94dfecfd3b1
+      internalID: -394783756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_17
+      rect:
+        serializedVersion: 2
+        x: 1089
+        y: 652
+        width: 214
+        height: 234
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 281feeeea5d449f428ad0c250d90d00b
+      internalID: -1128191606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_18
+      rect:
+        serializedVersion: 2
+        x: 1355
+        y: 646
+        width: 208
+        height: 234
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 600a83bd237add042888782ffceadf77
+      internalID: 10685369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_19
+      rect:
+        serializedVersion: 2
+        x: 1609
+        y: 641
+        width: 208
+        height: 237
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c65586f16ad235743aa7073151dab76a
+      internalID: -56051096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_20
+      rect:
+        serializedVersion: 2
+        x: 1896
+        y: 638
+        width: 172
+        height: 250
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82167fd2b35d8e14d933ff42a4fe401a
+      internalID: -995144888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_23
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 403
+        width: 271
+        height: 120
+      alignment: 9
+      pivot: {x: 0.5, y: 1.001976}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59b5ce841840d7a468ef3ce99dbf2dac
+      internalID: 606592263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_24
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 398
+        width: 205
+        height: 178
+      alignment: 9
+      pivot: {x: 0.5234979, y: 0.683483}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 352a26abae6dee147881f92aaa55c596
+      internalID: -1392214260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_25
+      rect:
+        serializedVersion: 2
+        x: 1041
+        y: 151
+        width: 1122
+        height: 407
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af380006cb8372e40853fe6e80a5fce1
+      internalID: 383143862
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_26
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 92
+        width: 156
+        height: 212
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: af61ab484d3aa0a49aa21ec5eb72c553
+      internalID: -332260123
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_27
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 175
+        width: 106
+        height: 127
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 254e4a95bdf811b4082ff63034d19d4f
+      internalID: -47691558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_28
+      rect:
+        serializedVersion: 2
+        x: 589
+        y: 264
+        width: 52
+        height: 41
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e79463b2136f5374baa290bf1c76a67b
+      internalID: -421140863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floe Sprites_29
+      rect:
+        serializedVersion: 2
+        x: 762
+        y: 248
+        width: 54
+        height: 52
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c3a657a81bb10e419c3978243bd1777
+      internalID: -812725132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      Floe Sprites_0: -1883560130
+      Floe Sprites_1: 1226087781
+      Floe Sprites_10: 1639232905
+      Floe Sprites_11: 1040734444
+      Floe Sprites_12: -1754379077
+      Floe Sprites_13: 2078624476
+      Floe Sprites_14: 84637205
+      Floe Sprites_15: 1511756453
+      Floe Sprites_16: -394783756
+      Floe Sprites_17: -1128191606
+      Floe Sprites_18: 10685369
+      Floe Sprites_19: -56051096
+      Floe Sprites_2: 1607056668
+      Floe Sprites_20: -995144888
+      Floe Sprites_21: -272238440
+      Floe Sprites_22: -1453363833
+      Floe Sprites_23: 606592263
+      Floe Sprites_24: -1392214260
+      Floe Sprites_25: 383143862
+      Floe Sprites_26: -332260123
+      Floe Sprites_27: -47691558
+      Floe Sprites_28: -421140863
+      Floe Sprites_29: -812725132
+      Floe Sprites_3: 1500803162
+      Floe Sprites_4: -983731803
+      Floe Sprites_5: 2018348873
+      Floe Sprites_6: 906511914
+      Floe Sprites_7: -656396974
+      Floe Sprites_8: 370128633
+      Floe Sprites_9: 559047138
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
