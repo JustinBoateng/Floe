@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -26,11 +27,16 @@ public class PlayerControl : MonoBehaviour
 
     private float horizontalInput;
 
-    [SerializeField] int[] facing = new int[2];
+    [SerializeField] public int[] facing { get; private set; } = new int[2];
     //0: horizontal facing, 1: vertical facing
+    //instead of doing an entire get and set function, we can just do this.
 
-    [SerializeField] float[] isShooting = new float[2];
+
+    [SerializeField] float[] isShooting = new float[2]; //used for the shooting animation
     //0: Max, 1: curr
+    
+    [SerializeField] float[] isHurt = new float[2]; //used for the KO animation
+    [SerializeField] float[] isKO = new float[2]; //used for the KO animation
      
     [SerializeField] int[] bulletSpeed = new int[2];
     //0: horizontal Speed, 1: vertical Speed
@@ -69,6 +75,25 @@ public class PlayerControl : MonoBehaviour
         AnimCalc();
     }
 
+
+    public void CooldownStart(string z)
+    {
+        switch (z)
+        {
+            case "Shoot":
+                isShooting[1] = isShooting[0];
+                break;            
+            case "WallJump":
+                WallJumpInfo[1] = WallJumpInfo[0];
+                break;            
+            case "KO":
+                isKO[1] = isKO[0];
+                break;            
+            case "Hurt":
+                isHurt[1] = isHurt[0];
+                break;
+        }
+    }
     private void CooldownCalc()
     {
 
@@ -108,6 +133,7 @@ public class PlayerControl : MonoBehaviour
             else if (Input.GetAxisRaw("Horizontal") < 0) facing[0] = -1;
         }
         transform.localScale = new Vector3(facing[0], 1, 1);
+        Debug.Log(facing[0]);
     }
 
 
@@ -157,7 +183,7 @@ public class PlayerControl : MonoBehaviour
 
                     facing[0] = -facing[0];
                     //transform.localScale = new Vector3(-1 * facing[0], transform.localScale.y, transform.localScale.z);
-                    WallJumpInfo[1] = WallJumpInfo[0];
+                    CooldownStart("WallJump");
                     
                 }
             }
@@ -166,9 +192,9 @@ public class PlayerControl : MonoBehaviour
 
     public void onShoot(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (context.started && isHurt[1] == 0) //We can shoot because we are not hurt
         {
-            isShooting[1] = isShooting[0];
+            CooldownStart("Shoot");
 
             GameObject b = Instantiate(BulletReferences[currentBullet].gameObject, ShootPosition.transform.position, this.transform.rotation);
             b.GetComponent<BulletClass>().setfacing(facing[0], facing[1]);
