@@ -19,6 +19,7 @@ public class PlayerControl : MonoBehaviour
     //[SerializeField] bool Grounded;
     [SerializeField] bool walking;
     [SerializeField] float JumpForce = 10;
+    float currSpeed;
     [SerializeField] float[] Speeds;
     //0: Fall, 1: Walk, 2: Run
 
@@ -34,8 +35,11 @@ public class PlayerControl : MonoBehaviour
 
     [SerializeField] float[] isShooting = new float[2]; //used for the shooting animation
     //0: Max, 1: curr
+    [SerializeField] float[] isDashing = new float[3];
+    //0: Max, 1: Curr, 2: isDashing
+    //used for invul frames and the boolean for if the player is, in fact, dashing
     
-    [SerializeField] float[] isHurt = new float[2]; //used for the KO animation
+    [SerializeField] float[] isHurt = new float[2]; //used for the Hurt animation
     [SerializeField] float[] isKO = new float[2]; //used for the KO animation
      
     [SerializeField] int[] bulletSpeed = new int[2];
@@ -92,6 +96,11 @@ public class PlayerControl : MonoBehaviour
             case "Hurt":
                 isHurt[1] = isHurt[0];
                 break;
+            case "Dash":
+                isDashing[1] = isDashing[0];
+                isDashing[2] = 1;
+                break;
+
         }
     }
     private void CooldownCalc()
@@ -107,7 +116,10 @@ public class PlayerControl : MonoBehaviour
     {
         //Set Animator Parameters
         anim.SetBool("Walking", walking);
+        anim.SetFloat("Dashing", isDashing[2]);
+
         anim.SetBool("Grounded", isGrounded());
+        
         anim.SetFloat("Vertical Speed", rb.velocity.y);
         anim.SetFloat("isShooting", isShooting[1]);
     }
@@ -118,7 +130,11 @@ public class PlayerControl : MonoBehaviour
         if (WallJumpInfo[1] <= 0)
         {
             rb.gravityScale = 1;
-            rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * Speeds[1], rb.velocity.y);
+            currSpeed = isDashing[2] == 1 ? Speeds[2] : Speeds[1];
+            //currSpeed equals if isDash[2] is equal to 1. If yes, then Speeds[2], if no, then Speeds[1]
+
+            rb.velocity = new Vector2(Input.GetAxisRaw("Horizontal") * currSpeed, rb.velocity.y);
+
         }
 
         WallSlide();
@@ -172,13 +188,13 @@ public class PlayerControl : MonoBehaviour
 
                     if (horizontalInput == 0)
                     {
-                        rb.velocity = new Vector2(-Mathf.Sign(facing[0]) * WallJumpInfo[2] * 2, WallJumpInfo[3]);
+                        rb.velocity = new Vector2(-Mathf.Sign(facing[0]) * WallJumpInfo[2] * 2 * (currSpeed / 4), WallJumpInfo[3]);
                         //jump farther if you're not holding towards the wall
                     }
 
                     else
                     {
-                        rb.velocity = new Vector2(-Mathf.Sign(facing[0]) * WallJumpInfo[2], WallJumpInfo[3]);
+                        rb.velocity = new Vector2(-Mathf.Sign(facing[0]) * WallJumpInfo[2] * (currSpeed / 4), WallJumpInfo[3]);
                     }
 
                     facing[0] = -facing[0];
@@ -187,6 +203,20 @@ public class PlayerControl : MonoBehaviour
                     
                 }
             }
+        }
+    }
+
+    public void onDash(InputAction.CallbackContext context)
+    {
+        if (context.started && isGrounded())
+        {
+            CooldownStart("Dash");
+        }
+
+
+        if (context.canceled)
+        {
+            isDashing[2] = 0;
         }
     }
 
