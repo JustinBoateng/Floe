@@ -32,6 +32,7 @@ public class Health : MonoBehaviour
     private void Start()
     {
         totalHealthBar.fillAmount = currentHealth / 10;
+        anim = GetComponent<Animator>();
 
         rbRef = GetComponent<Rigidbody2D>();
         playerRef = GetComponent<PlayerControl>();
@@ -68,6 +69,7 @@ public class Health : MonoBehaviour
         {
             //Player Hurt Animation
             playerRef.CooldownStart("Hurt");
+            playerRef.cantMove();
             anim.SetTrigger("Hurt");
 
             tookDamageRecoil[1] = tookDamageRecoil[0];
