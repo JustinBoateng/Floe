@@ -10,15 +10,15 @@ public class PlayerControl : MonoBehaviour
     float hor;
     float ver;
 
-    [SerializeField] bool inputLock = false;
-
-    Rigidbody2D rb;
-    //[SerializeField] BoxCollider2D[] ColliderChecks = new BoxCollider2D[2];
-    [SerializeField] BoxCollider2D ColliderCheck;// = new BoxCollider2D[2];
     private Animator anim;
-    //[SerializeField] CapsuleCollider2D[] ColliderChecks = new CapsuleCollider2D[2];
-    //0: BaseCollider
+    
+    Rigidbody2D rb;
 
+    [SerializeField] Transform GroundCheckLocation;
+
+    [SerializeField] bool inputLock = false;
+    [SerializeField] BoxCollider2D ColliderCheck;// = new BoxCollider2D[2];
+    
     [SerializeField] private LayerMask platformLayer;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask wallLayer;
@@ -31,9 +31,12 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private Vector2 CrouchColliderOffset = new Vector2(0f, -0.95f);
     [SerializeField] private Vector2 CrouchColliderDimensions =  new Vector2(1.629251f, 0.6012003f);
 
+    [SerializeField] private Vector2 VaultForce =  new Vector2(5, 2);
+
 
     [SerializeField] bool isCrouching = false;
     [SerializeField] bool isOnPlatform = false;
+    //[SerializeField] bool isVaulting = false;
     [SerializeField] bool walking;
     [SerializeField] float JumpForce = 10;
     [SerializeField] float currSpeed;
@@ -61,6 +64,8 @@ public class PlayerControl : MonoBehaviour
     //3: SlideMax (have Curr start at SlideMax instead of Max),
     //4: isSliding
     //5: Slide rate
+    //6: isVaulting
+    //7: VaultMax
     //used for invul frames and the boolean for if the player is, in fact, dashing
     
     [SerializeField] float[] isHurt = new float[2]; //used for the Hurt animation
@@ -138,6 +143,13 @@ public class PlayerControl : MonoBehaviour
                 isDashing[1] = isDashing[3];
                 cantMove();
                 break;
+            case "Vault":
+                //isVaulting = true;
+                Debug.Log("Vault Activated");
+
+                isDashing[6] = 1; //isVaulting = true
+                isDashing[1] = isDashing[7]; //set dashing to max 
+                break;
 
         }
     }
@@ -150,16 +162,25 @@ public class PlayerControl : MonoBehaviour
         
         isShooting[1] = Mathf.Clamp(isShooting[1] - Time.deltaTime, 0, isShooting[0]);
         WallJumpInfo[1] = Mathf.Clamp(WallJumpInfo[1] - Time.deltaTime, 0, WallJumpInfo[0]);
-        isDashing[1] = Mathf.Clamp(isDashing[1] - Time.deltaTime * isDashing[5], 0, isDashing[3]); 
-        
+        isDashing[1] = Mathf.Clamp(isDashing[1] - Time.deltaTime * isDashing[5], 0, isDashing[3]);
+
         //since [3] (for SlideMax) is greater than [0] (for dashing), we use [3] as a start
         //multiply time.deltatime by the SlideRate (isDashing[5])
+
+        //then you're not sliding
         if (isDashing[1] <= 0 || !isGrounded()) //if no longer sliding or dashing and you're not grounded,
         {
-            //then you're not sliding
             isDashing[4] = 0;
+
+         
         }
 
+        if (isDashing[1] <= 0 && isDashing[6] == 1)
+        {
+            //then you're not vaulting
+            isDashing[6] = 0;
+            
+        }
 
         if (LockCountDown[1] <= 0)
         {
@@ -216,14 +237,28 @@ public class PlayerControl : MonoBehaviour
 
         }
 
+        else if (isDashing[6] == 1) //if Vaulting
+        {
+            Debug.Log("Vaulting");
+            //rb.velocity = new Vector2(VaultForce.x * facing[0], VaultForce.y);
+            rb.AddForce(new Vector2(VaultForce.x* facing[0], VaultForce.y), ForceMode2D.Impulse);
+
+            isDashing[1] = 0;
+
+
+        }
+        //check if vaulting before if sliding. Vaulting is more situational than sliding
+
         else if (isDashing[4] == 1) //if sliding
         {
             Debug.Log("Sliding");
             rb.velocity = new Vector2(isDashing[1] * facing[0], rb.velocity.y);
+            
             inputLock = true;
         }
 
-        
+
+
         else //if just vibing...
         {
             rb.gravityScale = 1;
@@ -233,9 +268,12 @@ public class PlayerControl : MonoBehaviour
             //currSpeed depends on if isDashing[2] is equal to 1. If yes, then Speeds[2], if no, then Speeds[1]
             //currSpeed will adjust our horizontal ground speed depending on the boolean above
 
-            if (!inputLock)
-                rb.velocity = new Vector2(hor * currSpeed, rb.velocity.y);
-
+            if (!inputLock) {
+                if (!isGrounded())
+                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor, -Speeds[1], Speeds[1] ), rb.velocity.y);
+                else
+                    rb.velocity = new Vector2(hor * currSpeed, rb.velocity.y);
+            }
         }
 
 
@@ -271,111 +309,87 @@ public class PlayerControl : MonoBehaviour
     #endregion
 
     #region Controller Functions
-        public void onJump(InputAction.CallbackContext context)
+    public void onJump(InputAction.CallbackContext context)
+    {
+
+        if (context.started) 
         {
-
-            if (context.started) 
+            //vault
+            if (isDashing[4] == 1) //if sliding and you jump
             {
-                if (WallJumpInfo[1] <=0)
-                {
-                    if (isDashing[4] == 1)
-                    {
-                        //slide jump
-                    }
+                CooldownStart("Vault");
+            }
 
-                    //regular jump
-                    else if (isGrounded() && !isCrouching)
-                    {
-                        Debug.Log("Jumping");
-                        //rb.AddForce(new Vector2(0,JumpForce));
-                        rb.velocity = new Vector2(rb.velocity.x, JumpForce);
-                        anim.SetTrigger("Jump");
-                    }
+
+            //Wall Jump
+            else if (isOnWall() && !isGrounded())
+            {
+                CooldownStart("WallJump");
+            }
+
+            //regular jump
+            else if (isGrounded() && !isCrouching)
+            {
+                Debug.Log("Jumping");
+                //rb.AddForce(new Vector2(0,JumpForce));
+                rb.velocity = new Vector2(rb.velocity.x, JumpForce);
+                anim.SetTrigger("Jump");
+            }
  
-                    //Wall Jump
-                    else if (isOnWall() && !isGrounded())
-                    {
-                        //rb.gravityScale = 0;
-                        //rb.velocity = Vector2.zero;
-                        CooldownStart("WallJump");
-                        //anim.SetTrigger("Jump");
-
-                        //float wjForce = -facing[0] * WallJumpInfo[2];
-
-                        //Debug.Log(wjForce);
-                        /*
-                        if (hor == 0)
-                        {
-                            Debug.Log("Regular Wall Jump");
-                            //rb.velocity = new Vector2(-Mathf.Sign(facing[0]) * WallJumpInfo[2] * 2 * (currSpeed / 4), WallJumpInfo[3]);
-                            //rb.velocity = new Vector2(wjForce * 2, WallJumpInfo[3]);
-                            //jump farther if you're not holding towards the wall
-                        }
-
-                        else
-                        {
-                            Debug.Log("Held Wall Jump");
-                            //rb.velocity = new Vector2(-Mathf.Sign(facing[0]) * WallJumpInfo[2] * (currSpeed / 4), WallJumpInfo[3]);
-                            //rb.velocity = new Vector2(wjForce , WallJumpInfo[3]);
-                                
-                        }
-
-                        //transform.localScale = new Vector3(-1 * facing[0], transform.localScale.y, transform.localScale.z);
-                        */
-                    }
-                }
-            }
-
-            if (context.performed && isCrouching && isOnPlatform &&  ColliderCheck.enabled == true)
-            {
-                StartCoroutine(DisablePlayerCollider(DropdownTimer));
-            }
-        }
-
-        public void onDash(InputAction.CallbackContext context)
-        {
-            if (context.started && isGrounded())
-            {
-
-                if (isCrouching && isDashing[4] == 0)
-                {   //if you're crashing and not already sliding...
-                    //boost forward by applying a force in the way you are facing
-                    CooldownStart("Slide");
-                    isDashing[4] = 1;
-
-                }
-                else if (!inputLock)//not crouching
-                {
-                    CooldownStart("Dash");
-                }
-            }
-
-
-            if (context.canceled)
-            {
-                isDashing[2] = 0;
-            }
-        }
-
-        public void onShoot(InputAction.CallbackContext context)
-        {
-            if (context.started && isHurt[1] == 0) //We can shoot because we are not hurt
-            {
-                CooldownStart("Shoot");
-
-                GameObject b = Instantiate(BulletReferences[currentBullet].gameObject, ShootPosition.transform.position, this.transform.rotation);
-                b.GetComponent<BulletClass>().setfacing(facing[0], facing[1]);
-    
-                int movSpeed = 0;
-                if(walking)
-                    movSpeed = (int) Speeds[1];
             
-                //if running, set movSpeed to Speed[2]
-                //we want the current bullet to have the same speed as Floe when she's walking, running, or standing still
-                b.GetComponent<BulletClass>().setSpeed(bulletSpeed[0] + movSpeed, bulletSpeed[1]);
-                b.GetComponent<BulletClass>().setDeterioration(bulletDeterRate[0]);
+        }
+
+        //Dropdown
+        if (context.performed && isCrouching && isOnPlatform &&  ColliderCheck.enabled == true)
+        {
+            StartCoroutine(DisablePlayerCollider(DropdownTimer));
+        }
+    }
+
+    public void onDash(InputAction.CallbackContext context)
+    {
+        if (context.started && isGrounded())
+        {
+
+            if (isCrouching && isDashing[4] == 0)
+            {   //if you're crashing and not already sliding...
+                //boost forward by applying a force in the way you are facing
+                CooldownStart("Slide");
+                isDashing[4] = 1;
+
+            }
+            else if (!inputLock)//not crouching
+            {
+                CooldownStart("Dash");
             }
         }
+
+
+        if (context.canceled)
+        {
+            isDashing[2] = 0;
+        }
+    }
+
+    public void onShoot(InputAction.CallbackContext context)
+    {
+        if (context.started && isHurt[1] == 0) //We can shoot because we are not hurt
+        {
+            CooldownStart("Shoot");
+
+            GameObject b = Instantiate(BulletReferences[currentBullet].gameObject, ShootPosition.transform.position, this.transform.rotation);
+            b.GetComponent<BulletClass>().setfacing(facing[0], facing[1]);
+    
+            int movSpeed = 0;
+            if(walking)
+                movSpeed = (int) Speeds[1];
+            
+            //if running, set movSpeed to Speed[2]
+            //we want the current bullet to have the same speed as Floe when she's walking, running, or standing still
+            b.GetComponent<BulletClass>().setSpeed(bulletSpeed[0] + movSpeed, bulletSpeed[1]);
+            b.GetComponent<BulletClass>().setDeterioration(bulletDeterRate[0]);
+        }
+    }
     #endregion
 
 
@@ -385,11 +399,18 @@ public class PlayerControl : MonoBehaviour
     {
         RaycastHit2D ray = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, groundLayer);
         RaycastHit2D ray2 = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, platformLayer);
+        RaycastHit2D ray3 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(ColliderCheck.size.x, 1), 0, Vector2.down, 0.1f, groundLayer);
+        RaycastHit2D ray4 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(ColliderCheck.size.x, 1), 0, Vector2.down, 0.1f, platformLayer);
         //BoxCast(collider's centerpoint, size of the collider, rotation of box <at 0 because we dont wanna rotate, we want to check underneath the player - so point down, distance to position the virtual box, the layer we'll be checking for>
 
-        //Debug.DrawRay(ColliderCheck.bounds.center, Vector2.down, Color.red, 100);
+        Debug.DrawRay(GroundCheckLocation.transform.position, Vector2.down, Color.red, 1);
 
-        return ray.collider != null || ray2.collider != null;
+        //bool y = ray.collider != null || ray2.collider != null;
+        bool y = ray3.collider != null|| ray4.collider != null;
+        
+        Debug.Log(y);
+        
+        return y;
         //returns true if the ray hits a collider in the groundLayer.
     }
     
