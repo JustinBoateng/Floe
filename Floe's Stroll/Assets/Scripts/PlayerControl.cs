@@ -32,6 +32,7 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private Vector2 CrouchColliderDimensions =  new Vector2(1.629251f, 0.6012003f);
 
     [SerializeField] private Vector2 VaultForce =  new Vector2(5, 2);
+    //[SerializeField] private Vector2 SlideForce =  new Vector2(3, 0);
 
 
     [SerializeField] bool isCrouching = false;
@@ -59,14 +60,19 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] float[] isShooting = new float[2]; //used for the shooting animation
     //0: Max, 1: curr
     [SerializeField] float[] isDashing = new float[6];
-    //0: Max, 1: Curr,
+    //0: Max,
+    //1: Curr,
     //2: isDashing,
-    //3: SlideMax (have Curr start at SlideMax instead of Max),
-    //4: isSliding
-    //5: Slide rate
-    //6: isVaulting
-    //7: VaultMax
     //used for invul frames and the boolean for if the player is, in fact, dashing
+
+    [SerializeField] float[] isSliding = new float[4];
+    
+    [SerializeField] float[] isVaulting = new float[4];
+    //0:Max
+    //1:curr
+    //2:is or isnt 
+    //3:rate
+
     
     [SerializeField] float[] isHurt = new float[2]; //used for the Hurt animation
     [SerializeField] float[] isKO = new float[2]; //used for the KO animation
@@ -140,15 +146,15 @@ public class PlayerControl : MonoBehaviour
                 isDashing[2] = 1;
                 break;
             case "Slide":
-                isDashing[1] = isDashing[3];
+                isSliding[2] = 1;
+                isSliding[1] = isSliding[0];
                 cantMove();
                 break;
             case "Vault":
                 //isVaulting = true;
                 Debug.Log("Vault Activated");
 
-                isDashing[6] = 1; //isVaulting = true
-                isDashing[1] = isDashing[7]; //set dashing to max 
+                isVaulting[2] = 1; //isVaulting = true
                 break;
 
         }
@@ -162,25 +168,27 @@ public class PlayerControl : MonoBehaviour
         
         isShooting[1] = Mathf.Clamp(isShooting[1] - Time.deltaTime, 0, isShooting[0]);
         WallJumpInfo[1] = Mathf.Clamp(WallJumpInfo[1] - Time.deltaTime, 0, WallJumpInfo[0]);
-        isDashing[1] = Mathf.Clamp(isDashing[1] - Time.deltaTime * isDashing[5], 0, isDashing[3]);
+        //isDashing[1] = Mathf.Clamp(isDashing[1] - Time.deltaTime * isDashing[5], 0, isDashing[3]);
+        isSliding[1] = Mathf.Clamp(isSliding[1] - Time.deltaTime * isSliding[3], 0, isSliding[0]);
 
         //since [3] (for SlideMax) is greater than [0] (for dashing), we use [3] as a start
         //multiply time.deltatime by the SlideRate (isDashing[5])
 
         //then you're not sliding
-        if (isDashing[1] <= 0 || !isGrounded()) //if no longer sliding or dashing and you're not grounded,
+        if (isSliding[1] <= 0 || !isGrounded()) //if no longer sliding or dashing and you're not grounded,
         {
-            isDashing[4] = 0;
+            isSliding[2] = 0;
 
          
         }
 
-        if (isDashing[1] <= 0 && isDashing[6] == 1)
-        {
+        //if (isVaulting[1] <= 0 && isVaulting[2] == 1)
+        //{
             //then you're not vaulting
-            isDashing[6] = 0;
-            
-        }
+        //    isVaulting[2] = 0;
+         
+            //isVaulting[1] works as a cooldown so that the 
+        //}
 
         if (LockCountDown[1] <= 0)
         {
@@ -202,6 +210,9 @@ public class PlayerControl : MonoBehaviour
         
         anim.SetFloat("Vertical Speed", rb.velocity.y);
         anim.SetFloat("isShooting", isShooting[1]);
+
+        anim.SetFloat("isVaulting", isVaulting[1]);
+        anim.SetFloat("isSliding", isSliding[1]);
     }
     private void Movement()
     {
@@ -237,23 +248,25 @@ public class PlayerControl : MonoBehaviour
 
         }
 
-        else if (isDashing[6] == 1) //if Vaulting
+        else if (isVaulting[2] == 1) //if Vaulting
         {
             Debug.Log("Vaulting");
             //rb.velocity = new Vector2(VaultForce.x * facing[0], VaultForce.y);
             rb.AddForce(new Vector2(VaultForce.x* facing[0], VaultForce.y), ForceMode2D.Impulse);
 
-            isDashing[1] = 0;
+            isVaulting[2] = 0;
 
 
         }
         //check if vaulting before if sliding. Vaulting is more situational than sliding
 
-        else if (isDashing[4] == 1) //if sliding
+        else if (isSliding[2] == 1) //if sliding
         {
             Debug.Log("Sliding");
-            rb.velocity = new Vector2(isDashing[1] * facing[0], rb.velocity.y);
-            
+            rb.velocity = new Vector2(isSliding[1] * facing[0], rb.velocity.y);
+            //rb.AddForce(new Vector2(SlideForce.x * facing[0], SlideForce.y), ForceMode2D.Impulse);
+            //isDashing[4] = 0;
+            //You'd have to adjust how the game detects sliding after a set time if you want to do rb.addforce. Vaulting depends on recognizing if your sliding. 
             inputLock = true;
         }
 
@@ -270,7 +283,7 @@ public class PlayerControl : MonoBehaviour
 
             if (!inputLock) {
                 if (!isGrounded())
-                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor, -Speeds[1], Speeds[1] ), rb.velocity.y);
+                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor, rb.velocity.x, rb.velocity.x ), rb.velocity.y);
                 else
                     rb.velocity = new Vector2(hor * currSpeed, rb.velocity.y);
             }
@@ -315,7 +328,7 @@ public class PlayerControl : MonoBehaviour
         if (context.started) 
         {
             //vault
-            if (isDashing[4] == 1) //if sliding and you jump
+            if (isSliding[2] == 1) //if sliding and you jump
             {
                 CooldownStart("Vault");
             }
@@ -351,11 +364,10 @@ public class PlayerControl : MonoBehaviour
         if (context.started && isGrounded())
         {
 
-            if (isCrouching && isDashing[4] == 0)
+            if (isCrouching && isSliding[2] == 0)
             {   //if you're crashing and not already sliding...
-                //boost forward by applying a force in the way you are facing
+                //boost forward by applying a force in the way you are facing   
                 CooldownStart("Slide");
-                isDashing[4] = 1;
 
             }
             else if (!inputLock)//not crouching
