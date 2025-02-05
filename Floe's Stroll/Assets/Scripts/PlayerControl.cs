@@ -4,15 +4,17 @@ using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerControl : MonoBehaviour
+public class PlayerControl : Being
 {
 
-    float hor;
-    float ver;
+    [SerializeField] float hor;
+    [SerializeField] float ver;
+    [SerializeField] float Deadzone = 0.4f;
 
     private Animator anim;
     
     Rigidbody2D rb;
+
 
     [SerializeField] Transform GroundCheckLocation;
 
@@ -84,9 +86,16 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] float[] bulletDeterRate = { 2 };
     //determines how long bullets stay active for
 
-    [SerializeField] GameObject ShootPosition;
+    [SerializeField] GameObject[] ShootPosition;
     [SerializeField] BulletClass[] BulletReferences;
-    
+    //[SerializeField] Vector2[] AimPositions = new Vector2[5];
+    //This brings complications, since you're changing the position of an object that's attached to another object
+    [SerializeField] Vector2[] BulletSpeeds = new Vector2[5];
+    [SerializeField] int Aim;
+
+    [SerializeField] int StartingAmmo;
+
+
     [SerializeField] int currentBullet;
     // Start is called before the first frame update
 
@@ -100,7 +109,9 @@ public class PlayerControl : MonoBehaviour
 
         //ColliderChecks[0] = GetComponent<CapsuleCollider2D>();
         facing[0] = 1;
-        facing[1] = 0;
+        facing[1] = 1;
+
+        SetMaxAmmo(StartingAmmo);
     }
 
     // Update is called once per frame
@@ -122,6 +133,10 @@ public class PlayerControl : MonoBehaviour
 
         CooldownCalc();
         AnimCalc();
+
+        AimMovement();
+
+        //Debug.Log("Current Ammo: " + GetAmmo());
     }
 
 
@@ -295,7 +310,10 @@ public class PlayerControl : MonoBehaviour
             if (!inputLock) {
                 if (!isGrounded())
                     //rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor, rb.velocity.x, rb.velocity.x), rb.velocity.y);
-                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor * currSpeed, -Speeds[0], Speeds[0]), rb.velocity.y);
+                    //rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor * currSpeed, -Speeds[0], Speeds[0]), rb.velocity.y);
+                    //having the cap be whatever currSpeed is set to (Speeds[2] or Speeds[1]) allows for consistant aerial speed
+                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor * currSpeed, -currSpeed, currSpeed), rb.velocity.y);
+
                 else
                     rb.velocity = new Vector2(hor * currSpeed, rb.velocity.y);
             }
@@ -306,7 +324,34 @@ public class PlayerControl : MonoBehaviour
         
     }
 
+    private void AimMovement()
+    {
 
+
+        if(hor == -facing[0] && !isGrounded())
+        {
+            Aim = 2;
+        }
+
+        else if(ver >= Deadzone)
+        {
+            Aim = 3;
+        }
+        
+        else if(ver <= -Deadzone)
+        {
+            Aim = 4;
+        }
+
+
+        else 
+        {
+            Aim = 1;
+        }
+        Debug.Log("Curr Aim: " + Aim);
+        //ShootPosition.transform.position = AimPositions[Aim];
+
+    }
 
     #region DropDown Mechanic
     private void OnCollisionEnter2D(Collision2D collision)
@@ -399,19 +444,30 @@ public class PlayerControl : MonoBehaviour
     {
         if (context.started && isHurt[1] == 0) //We can shoot because we are not hurt
         {
-            CooldownStart("Shoot");
+            if (GetAmmo() > 0)
+            {
+                AmmoCalc(-1);
+                CooldownStart("Shoot");
 
-            GameObject b = Instantiate(BulletReferences[currentBullet].gameObject, ShootPosition.transform.position, this.transform.rotation);
-            b.GetComponent<BulletClass>().setfacing(facing[0], facing[1]);
-    
-            int movSpeed = 0;
-            if(walking)
-                movSpeed = (int) Speeds[1];
-            
-            //if running, set movSpeed to Speed[2]
-            //we want the current bullet to have the same speed as Floe when she's walking, running, or standing still
-            b.GetComponent<BulletClass>().setSpeed(bulletSpeed[0] + movSpeed, bulletSpeed[1]);
-            b.GetComponent<BulletClass>().setDeterioration(bulletDeterRate[0]);
+
+                GameObject b = Instantiate(BulletReferences[currentBullet].gameObject, ShootPosition[Aim].transform.position, this.transform.rotation);
+                b.GetComponent<BulletClass>().setfacing(facing[0], facing[1]);
+
+                int movSpeed = 0;
+                if (walking)
+                    movSpeed = (int)Speeds[1];
+
+                //if running, set movSpeed to Speed[2]
+                //we want the current bullet to have the same speed as Floe when she's walking, running, or standing still
+
+
+                //b.GetComponent<BulletClass>().setSpeed(bulletSpeed[0] + movSpeed, bulletSpeed[1]);
+                //b.GetComponent<BulletClass>().setSpeed(BulletSpeeds[Aim].x + (movSpeed * facing[0]), BulletSpeeds[Aim].y);
+                b.GetComponent<BulletClass>().setSpeed(BulletSpeeds[Aim].x , BulletSpeeds[Aim].y);
+
+                b.GetComponent<BulletClass>().setDeterioration(bulletDeterRate[0]);
+                b.GetComponent<BulletClass>().setSignature(this);
+            }
         }
     }
     #endregion
@@ -449,11 +505,17 @@ public class PlayerControl : MonoBehaviour
 
     private void facingCalc()
     {
+        //use isGrounded so that you turn only when grounded
         if (isGrounded())
         {
             if (hor > 0) facing[0] = 1;
             else if (hor < 0) facing[0] = -1;
         }
+
+
+        if(ver > 0) facing[1] = 1;
+        else if (ver < 0) facing[1] = -1;
+
         transform.localScale = new Vector3(facing[0], 1, 1);
         //Debug.Log(facing[0]);
     }

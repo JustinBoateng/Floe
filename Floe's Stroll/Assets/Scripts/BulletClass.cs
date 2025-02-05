@@ -10,7 +10,9 @@ public class BulletClass : MonoBehaviour
     [SerializeField] private int[] facing = new int[2];
     Rigidbody2D rb;
 
-    [SerializeField] float[] LifeExpectancy = {0,0,0}; 
+    [SerializeField] float[] LifeExpectancy = {0,0,0};
+
+    [SerializeField] public Being Signature;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +23,12 @@ public class BulletClass : MonoBehaviour
     void Update()
     {
         rb.velocity = new Vector2(xSpeed * facing[0], ySpeed * facing[1]);
+        //Note; the ySpeed going in must always be positive, since facing[1] can be negative in the air.
+        //this bullet's facing[0] can never be negative compared to the player's facing[0] IF the player is in the air.
+        //hence the different treatment between facing[0] and facing[1]
+        //When in the air, a bullet's facing[0] WILL Equal it's Signature's facing[0]
+ 
+
 
         BulletDeterioration();
     }
@@ -31,7 +39,7 @@ public class BulletClass : MonoBehaviour
         facing[1] = y;
     }
     
-    public void setSpeed(int x, int y)
+    public void setSpeed(float x, float y)
     {
         xSpeed = x;
         ySpeed= y;
@@ -44,10 +52,17 @@ public class BulletClass : MonoBehaviour
         LifeExpectancy[2] = rate;
     }
 
+    public void setSignature(Being B)
+    {
+        Signature = B;
+    }
     private void BulletDeterioration()
     {
         LifeExpectancy[1] += LifeExpectancy[2];
         if (LifeExpectancy[1] >= LifeExpectancy[0])
+        {
+            Signature.AmmoCalc(1);
             Destroy(this.gameObject);
+        }
     }
 }
