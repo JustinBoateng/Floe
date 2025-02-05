@@ -37,6 +37,7 @@ public class PlayerControl : MonoBehaviour
 
     [SerializeField] bool isCrouching = false;
     [SerializeField] bool isOnPlatform = false;
+    [SerializeField] bool isWallRunning = false;
     //[SerializeField] bool isVaulting = false;
     [SerializeField] bool walking;
     [SerializeField] float JumpForce = 10;
@@ -45,7 +46,7 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private float[] LockCountDown = new float[2];
 
     [SerializeField] float[] Speeds;
-    //0: Fall, 1: Walk, 2: Run
+    //0: Max, 1: Walk, 2: Run
 
     [SerializeField] float[] WallJumpInfo;
     //0: Max, 1: Curr, 2: Amount to push away from Wall, 3: Amount to be pushed upwards, 4: WallSliding Speed, 5: Player inputting left or right does nothing for this long
@@ -70,7 +71,7 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] float[] isVaulting = new float[4];
     //0:Max
     //1:curr
-    //2:is or isnt 
+    //2:is or isnt (initially)
     //3:rate
 
     
@@ -154,6 +155,7 @@ public class PlayerControl : MonoBehaviour
                 //isVaulting = true;
                 Debug.Log("Vault Activated");
 
+                isVaulting[1] = isVaulting[0];
                 isVaulting[2] = 1; //isVaulting = true
                 break;
 
@@ -170,6 +172,11 @@ public class PlayerControl : MonoBehaviour
         WallJumpInfo[1] = Mathf.Clamp(WallJumpInfo[1] - Time.deltaTime, 0, WallJumpInfo[0]);
         //isDashing[1] = Mathf.Clamp(isDashing[1] - Time.deltaTime * isDashing[5], 0, isDashing[3]);
         isSliding[1] = Mathf.Clamp(isSliding[1] - Time.deltaTime * isSliding[3], 0, isSliding[0]);
+        
+        isVaulting[1] = Mathf.Clamp(isVaulting[1] - Time.deltaTime, 0, isVaulting[0]);
+        //isVAulting[2] being set to 0 is handled in the Update function
+        //this isVaulting[1] counter handles if you're in a vault state
+
 
         //since [3] (for SlideMax) is greater than [0] (for dashing), we use [3] as a start
         //multiply time.deltatime by the SlideRate (isDashing[5])
@@ -182,18 +189,20 @@ public class PlayerControl : MonoBehaviour
          
         }
 
-        //if (isVaulting[1] <= 0 && isVaulting[2] == 1)
-        //{
-            //then you're not vaulting
-        //    isVaulting[2] = 0;
+        if (isVaulting[1] > 0 &&  isGrounded() && isSliding[1] <= 0)
+        {
+           
+            isVaulting[1] = 0;
          
-            //isVaulting[1] works as a cooldown so that the 
-        //}
+        
+        }
 
         if (LockCountDown[1] <= 0)
         {
             inputLock = false;
         }
+
+
         //we want to do -= instead of += due to being easier to work with the animator. We can change states depending on if the current value of something is greater than 0 instead of less than some arbitrary number
         
     }
@@ -226,7 +235,7 @@ public class PlayerControl : MonoBehaviour
         if (!inputLock)
         {
             facingCalc();
-            WallSlideCheck();
+            WallMovementCheck(); // Handles Wall Sliding and Wall Running
             CrouchCheck();
 
             //because CrouchCheck is checked only if we're not inputLocked, we can slide off of platforms smoothly
@@ -242,7 +251,7 @@ public class PlayerControl : MonoBehaviour
             rb.gravityScale = 0;
 
             //facing is adjusted in facingCalc() a few lines above
-            if(hor == 0) rb.velocity = new Vector2(facing[0] * WallJumpInfo[2] * (currSpeed / 4), WallJumpInfo[3]);
+            if (hor == 0) rb.velocity = new Vector2(facing[0] * WallJumpInfo[2] * (currSpeed / 4), WallJumpInfo[3]);
             else rb.velocity = new Vector2(facing[0] * WallJumpInfo[2] * 1.2f * (currSpeed / 4), WallJumpInfo[3]);
 
 
@@ -252,8 +261,9 @@ public class PlayerControl : MonoBehaviour
         {
             Debug.Log("Vaulting");
             //rb.velocity = new Vector2(VaultForce.x * facing[0], VaultForce.y);
-            rb.AddForce(new Vector2(VaultForce.x* facing[0], VaultForce.y), ForceMode2D.Impulse);
+            rb.AddForce(new Vector2(VaultForce.x * facing[0], VaultForce.y), ForceMode2D.Impulse);
 
+            //we add force once
             isVaulting[2] = 0;
 
 
@@ -270,6 +280,7 @@ public class PlayerControl : MonoBehaviour
             inputLock = true;
         }
 
+        else if (isWallRunning) { }
 
 
         else //if just vibing...
@@ -283,7 +294,8 @@ public class PlayerControl : MonoBehaviour
 
             if (!inputLock) {
                 if (!isGrounded())
-                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor, rb.velocity.x, rb.velocity.x ), rb.velocity.y);
+                    //rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor, rb.velocity.x, rb.velocity.x), rb.velocity.y);
+                    rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor * currSpeed, -Speeds[0], Speeds[0]), rb.velocity.y);
                 else
                     rb.velocity = new Vector2(hor * currSpeed, rb.velocity.y);
             }
@@ -420,7 +432,7 @@ public class PlayerControl : MonoBehaviour
         //bool y = ray.collider != null || ray2.collider != null;
         bool y = ray3.collider != null|| ray4.collider != null;
         
-        Debug.Log(y);
+        //Debug.Log(y);
         
         return y;
         //returns true if the ray hits a collider in the groundLayer.
@@ -446,15 +458,32 @@ public class PlayerControl : MonoBehaviour
         //Debug.Log(facing[0]);
     }
 
-    private void WallSlideCheck()
+    private void WallMovementCheck()
     {
         if (isOnWall() && !isGrounded() && hor == facing[0])
         {
-            Debug.Log("WallSliding");
-            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -WallJumpInfo[4], float.MaxValue));
+            if (isVaulting[1] > 0 || isWallRunning) //if we hit a wall while Vaulting or already WallRUnnning
+            {
+                Debug.Log("WallRunning");
+                isWallRunning = true;
+                rb.velocity = new Vector2(rb.velocity.x, Speeds[1]);
+
+                //now to find a time to turn isWallRunning off
+            }
+            
+            else
+            {
+                Debug.Log("WallSliding");
+                rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -WallJumpInfo[4], float.MaxValue));
+            }
             //clamp makes it so that the min is -wallJumpInfo[4] and the max is the highest float number possible. This makes it so the rb.velocity.y can be no less than -WallJumpInfo[4]
             //We want the speed the player falls at to decrease, thus we need to cap the minimum, hence, limiting how fast the player falls.
 
+        }
+
+        if (!isOnWall() || isGrounded() || hor != facing[0])
+        {
+            isWallRunning = false;
         }
     }
 
