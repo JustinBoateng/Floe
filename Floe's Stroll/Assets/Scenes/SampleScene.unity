@@ -1963,6 +1963,9 @@ MonoBehaviour:
   - 0
   - 0
   - 0
+  isRolling: 0
+  RollDecay: 0.25
+  SlopeCoefficient: 0.7
   isHurt:
   - 0
   - 0
@@ -1989,6 +1992,7 @@ MonoBehaviour:
   Aim: 0
   StartingAmmo: 3
   currentBullet: 0
+  VelocityRef: {x: 0, y: 0}
 --- !u!50 &1435795762
 Rigidbody2D:
   serializedVersion: 4

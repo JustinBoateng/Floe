@@ -76,6 +76,9 @@ public class PlayerControl : Being
     //2:is or isnt (initially)
     //3:rate
 
+    [SerializeField] bool isRolling = false;
+    [SerializeField] float RollDecay = 0.5f;
+    [SerializeField] float SlopeCoefficient = 0.7f;
     
     [SerializeField] float[] isHurt = new float[2]; //used for the Hurt animation
     [SerializeField] float[] isKO = new float[2]; //used for the KO animation
@@ -99,7 +102,7 @@ public class PlayerControl : Being
     [SerializeField] int currentBullet;
     // Start is called before the first frame update
 
-
+    [SerializeField] Vector2 VelocityRef;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -119,7 +122,7 @@ public class PlayerControl : Being
     {
         //Debug.Log(Input.GetAxisRaw("Horizontal"));
 
-
+        VelocityRef = rb.velocity;
 
         hor = Input.GetAxisRaw("Horizontal");
         ver = Input.GetAxisRaw("Vertical");
@@ -206,10 +209,12 @@ public class PlayerControl : Being
 
         if (isVaulting[1] > 0 &&  isGrounded() && isSliding[1] <= 0)
         {
-           
-            isVaulting[1] = 0;
-         
-        
+           isVaulting[1] = 0;
+        }
+
+        if (Mathf.Abs(rb.velocity.x) < Mathf.Abs(facing[0])|| !isGrounded() || !isCrouching)
+        {
+            isRolling = false;
         }
 
         if (LockCountDown[1] <= 0)
@@ -251,7 +256,7 @@ public class PlayerControl : Being
         {
             facingCalc();
             WallMovementCheck(); // Handles Wall Sliding and Wall Running
-            CrouchCheck();
+            CrouchRollCheck(); //Handles Crouching and Rolling
 
             //because CrouchCheck is checked only if we're not inputLocked, we can slide off of platforms smoothly
             //isDashing[4] is set to false because we are not grounded, due to the cooldownCacl
@@ -295,7 +300,12 @@ public class PlayerControl : Being
             inputLock = true;
         }
 
-        else if (isWallRunning) { }
+        else if (isRolling) 
+        {
+            SlopeCoefficient = rb.velocity.y < 0 ? .7f : 0;
+
+            rb.velocity = new Vector2(rb.velocity.x + (RollDecay * -facing[0]) + (SlopeCoefficient * facing[0]), rb.velocity.y);
+        }
 
 
         else //if just vibing...
@@ -549,10 +559,15 @@ public class PlayerControl : Being
         }
     }
 
-    private void CrouchCheck()
+    
+    private void CrouchRollCheck()
 {
-    if (ver <= -0.8f && isGrounded())
+    if (ver <= -Deadzone && isGrounded())
     {
+            if (isDashing[2] == 1 && Mathf.Abs(rb.velocity.x) > Mathf.Abs(facing[0]))
+            {
+                isRolling = true;
+            }
         isCrouching = true;
         ColliderCheck.size = CrouchColliderDimensions;
         ColliderCheck.offset = CrouchColliderOffset;
