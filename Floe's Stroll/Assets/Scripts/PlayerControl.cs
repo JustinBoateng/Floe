@@ -63,10 +63,12 @@ public class PlayerControl : Being
     [SerializeField] float[] isShooting = new float[2]; //used for the shooting animation
     //0: Max, 1: curr
     [SerializeField] float[] isDashing = new float[6];
-    //0: Max,
-    //1: Curr,
-    //2: isDashing,
+    //0: Max, 1: Curr, 2: isDashing,
     //used for invul frames and the boolean for if the player is, in fact, dashing
+
+    [SerializeField] float[] AirDashInfo = new float[5];
+    //0: MaxTimer, 1: Curr, 2: MaxAirDashes 3:NumOfAirDashLeft, 4:AirDashForce
+
 
     [SerializeField] float[] isSliding = new float[4];
     
@@ -83,7 +85,7 @@ public class PlayerControl : Being
     [SerializeField] float[] isHurt = new float[2]; //used for the Hurt animation
     [SerializeField] float[] isKO = new float[2]; //used for the KO animation
      
-    [SerializeField] int[] bulletSpeed = new int[2];
+    //[SerializeField] int[] bulletSpeed = new int[2];
     //0: horizontal Speed, 1: vertical Speed
     
     [SerializeField] float[] bulletDeterRate = { 2 };
@@ -115,6 +117,7 @@ public class PlayerControl : Being
         facing[1] = 1;
 
         SetMaxAmmo(StartingAmmo);
+        AirDashReplenish();
     }
 
     // Update is called once per frame
@@ -176,6 +179,15 @@ public class PlayerControl : Being
                 isVaulting[1] = isVaulting[0];
                 isVaulting[2] = 1; //isVaulting = true
                 break;
+            case "AirDash":
+                Debug.Log("AirDashing");
+                AirDashInfo[3]--;
+                AirDashInfo[1] = AirDashInfo[0];
+                if(hor != 0)
+                {
+                    facing[0] = hor >= 0 ? 1 : -1;
+                }
+                break;
 
         }
     }
@@ -199,7 +211,14 @@ public class PlayerControl : Being
         //since [3] (for SlideMax) is greater than [0] (for dashing), we use [3] as a start
         //multiply time.deltatime by the SlideRate (isDashing[5])
 
-        //then you're not sliding
+
+        AirDashInfo[1] = Mathf.Clamp(AirDashInfo[1] - Time.deltaTime, 0, AirDashInfo[0]);
+
+        if (AirDashInfo[1] <= 0 || isGrounded())
+        {
+            AirDashReplenish();
+        }
+
         if (isSliding[1] <= 0 || !isGrounded()) //if no longer sliding or dashing and you're not grounded,
         {
             isSliding[2] = 0;
@@ -307,6 +326,10 @@ public class PlayerControl : Being
             rb.velocity = new Vector2(rb.velocity.x + (RollDecay * -facing[0]) + (SlopeCoefficient * facing[0]), rb.velocity.y);
         }
 
+        else if (AirDashInfo[1] >= 1)
+        {
+            rb.velocity = new Vector2(AirDashInfo[4] * facing[0], 0);
+        }
 
         else //if just vibing...
         {
@@ -429,7 +452,7 @@ public class PlayerControl : Being
     public void onDash(InputAction.CallbackContext context)
     {
         if (context.started && isGrounded())
-        {
+        {            
 
             if (isCrouching && isSliding[2] == 0)
             {   //if you're crashing and not already sliding...
@@ -441,6 +464,15 @@ public class PlayerControl : Being
             {
                 CooldownStart("Dash");
             }
+        }
+
+        else if (context.started && !isGrounded())
+        {
+            if (AirDashInfo[3] > 0)
+            {
+                CooldownStart("AirDash");
+            }
+
         }
 
 
@@ -586,6 +618,12 @@ public class PlayerControl : Being
 
 
     #endregion
+
+
+    private void AirDashReplenish()
+    {
+        AirDashInfo[3] = AirDashInfo[2];
+    }
 
 
     public void cantMove()

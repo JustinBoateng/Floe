@@ -1953,6 +1953,12 @@ MonoBehaviour:
   - 25
   - 0
   - 25
+  AirDashInfo:
+  - 1.2
+  - 0
+  - 1
+  - 0
+  - 14
   isSliding:
   - 17
   - 0
@@ -1972,7 +1978,6 @@ MonoBehaviour:
   isKO:
   - 0
   - 0
-  bulletSpeed: 0500000000000000
   bulletDeterRate:
   - 0.25
   ShootPosition:
