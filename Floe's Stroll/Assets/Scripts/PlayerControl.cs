@@ -17,13 +17,15 @@ public class PlayerControl : Being
 
 
     [SerializeField] Transform GroundCheckLocation;
-
+    [SerializeField] Transform MountCheckLocation;
+    
     [SerializeField] bool inputLock = false;
     [SerializeField] BoxCollider2D ColliderCheck;// = new BoxCollider2D[2];
     
     [SerializeField] private LayerMask platformLayer;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask wallLayer;
+    [SerializeField] private LayerMask mountLayer;
 
     [SerializeField] private float DropdownTimer = 0.25f;
 
@@ -40,6 +42,7 @@ public class PlayerControl : Being
     [SerializeField] bool isCrouching = false;
     [SerializeField] bool isOnPlatform = false;
     [SerializeField] bool isWallRunning = false;
+    [SerializeField] bool isClimbing = false;
     //[SerializeField] bool isVaulting = false;
     [SerializeField] bool walking;
     [SerializeField] float JumpForce = 10;
@@ -49,6 +52,7 @@ public class PlayerControl : Being
 
     [SerializeField] float[] Speeds;
     //0: Max, 1: Walk, 2: Run
+    //Should you have speeds for climbing as well?
 
     [SerializeField] float[] WallJumpInfo;
     //0: Max, 1: Curr, 2: Amount to push away from Wall, 3: Amount to be pushed upwards, 4: WallSliding Speed, 5: Player inputting left or right does nothing for this long
@@ -181,6 +185,9 @@ public class PlayerControl : Being
                 break;
             case "AirDash":
                 Debug.Log("AirDashing");
+
+                isClimbing = false;
+
                 AirDashInfo[3]--;
                 AirDashInfo[1] = AirDashInfo[0];
                 if(hor != 0)
@@ -214,16 +221,15 @@ public class PlayerControl : Being
 
         AirDashInfo[1] = Mathf.Clamp(AirDashInfo[1] - Time.deltaTime, 0, AirDashInfo[0]);
 
-        if (AirDashInfo[1] <= 0 || isGrounded())
+        //if (AirDashInfo[1] <= 0 || isGrounded())
+        if (isGrounded())
         {
             AirDashReplenish();
         }
 
         if (isSliding[1] <= 0 || !isGrounded()) //if no longer sliding or dashing and you're not grounded,
         {
-            isSliding[2] = 0;
-
-         
+            isSliding[2] = 0;         
         }
 
         if (isVaulting[1] > 0 &&  isGrounded() && isSliding[1] <= 0)
@@ -267,8 +273,8 @@ public class PlayerControl : Being
         if (isCrouching) hor = 0;
         //hor cannot change if you're crouching
 
-        walking = hor != 0;
         //walking flag
+        walking = hor != 0;
 
         //General Checks
         if (!inputLock)
@@ -276,15 +282,26 @@ public class PlayerControl : Being
             facingCalc();
             WallMovementCheck(); // Handles Wall Sliding and Wall Running
             CrouchRollCheck(); //Handles Crouching and Rolling
-
-            //because CrouchCheck is checked only if we're not inputLocked, we can slide off of platforms smoothly
-            //isDashing[4] is set to false because we are not grounded, due to the cooldownCacl
-            //Then, since we are both "not sliding" yet "still crouching"...,
-            //we go to the default state, with the default rb.velocity calculations, and the crouching dimensions, respectively...
+            {
+                //because CrouchCheck is checked only if we're not inputLocked, we can slide off of platforms smoothly
+                //isDashing[4] is set to false because we are not grounded, due to the cooldownCacl
+                //Then, since we are both "not sliding" yet "still crouching"...,
+                //we go to the default state, with the default rb.velocity calculations, and the crouching dimensions, respectively...
+            }
         }
 
+        //if climbing
+        if (canClimb() && Mathf.Abs(ver) >= Deadzone || isClimbing)
+        {
+            Debug.Log("Climbing");
+            AirDashReplenish(); //replenish airdash when climbing
+            isClimbing = true;
+            rb.gravityScale = 0;
+            rb.velocity = new Vector2(hor * Speeds[1], ver * Speeds[1]);
+        }
 
-        if (WallJumpInfo[1] > 0) // if wall jumping
+        // if wall jumping
+        else if (WallJumpInfo[1] > 0)
         {
             Debug.Log("Wall Jumping");
             rb.gravityScale = 0;
@@ -292,61 +309,62 @@ public class PlayerControl : Being
             //facing is adjusted in facingCalc() a few lines above
             if (hor == 0) rb.velocity = new Vector2(facing[0] * WallJumpInfo[2] * (currSpeed / 4), WallJumpInfo[3]);
             else rb.velocity = new Vector2(facing[0] * WallJumpInfo[2] * 1.2f * (currSpeed / 4), WallJumpInfo[3]);
-
-
         }
 
-        else if (isVaulting[2] == 1) //if Vaulting
+        //if Vaulting
+        else if (isVaulting[2] == 1) 
         {
             Debug.Log("Vaulting");
-            //rb.velocity = new Vector2(VaultForce.x * facing[0], VaultForce.y);
             rb.AddForce(new Vector2(VaultForce.x * facing[0], VaultForce.y), ForceMode2D.Impulse);
-
             //we add force once
             isVaulting[2] = 0;
-
-
         }
         //check if vaulting before if sliding. Vaulting is more situational than sliding
 
-        else if (isSliding[2] == 1) //if sliding
+        //if sliding
+        else if (isSliding[2] == 1) 
         {
             Debug.Log("Sliding");
             rb.velocity = new Vector2(isSliding[1] * facing[0], rb.velocity.y);
-            //rb.AddForce(new Vector2(SlideForce.x * facing[0], SlideForce.y), ForceMode2D.Impulse);
-            //isDashing[4] = 0;
-            //You'd have to adjust how the game detects sliding after a set time if you want to do rb.addforce. Vaulting depends on recognizing if your sliding. 
+            {//rb.AddForce(new Vector2(SlideForce.x * facing[0], SlideForce.y), ForceMode2D.Impulse);
+             //isDashing[4] = 0;
+             //You'd have to adjust how the game detects sliding after a set time if you want to do rb.addforce. Vaulting depends on recognizing if your sliding. 
+            }
             inputLock = true;
         }
 
+        //if rolling
         else if (isRolling) 
         {
             SlopeCoefficient = rb.velocity.y < 0 ? .7f : 0;
-
             rb.velocity = new Vector2(rb.velocity.x + (RollDecay * -facing[0]) + (SlopeCoefficient * facing[0]), rb.velocity.y);
         }
 
-        else if (AirDashInfo[1] >= 1)
+        // if air dashing
+        else if (AirDashInfo[1] >= 1) 
         {
             rb.velocity = new Vector2(AirDashInfo[4] * facing[0], 0);
         }
 
-        else //if just vibing...
+        //if just vibing...
+        else
         {
             rb.gravityScale = 1;
 
             currSpeed = isDashing[2] == 1 ? Speeds[2] : Speeds[1];
-            //currSpeed adjustment
-            //currSpeed depends on if isDashing[2] is equal to 1. If yes, then Speeds[2], if no, then Speeds[1]
-            //currSpeed will adjust our horizontal ground speed depending on the boolean above
-
+            {
+                //currSpeed adjustment
+                //currSpeed depends on if isDashing[2] is equal to 1. If yes, then Speeds[2], if no, then Speeds[1]
+                //currSpeed will adjust our horizontal ground speed depending on the boolean above
+            }
             if (!inputLock) {
-                if (!isGrounded())
+                {
                     //rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor, rb.velocity.x, rb.velocity.x), rb.velocity.y);
                     //rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor * currSpeed, -Speeds[0], Speeds[0]), rb.velocity.y);
                     //having the cap be whatever currSpeed is set to (Speeds[2] or Speeds[1]) allows for consistant aerial speed
+                }
+                if (!isGrounded())
                     rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + hor * currSpeed, -currSpeed, currSpeed), rb.velocity.y);
-
                 else
                     rb.velocity = new Vector2(hor * currSpeed, rb.velocity.y);
             }
@@ -389,14 +407,16 @@ public class PlayerControl : Being
     #region DropDown Mechanic
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform"))
+        //if (collision.gameObject.CompareTag("Platform"))
+        if (collision.gameObject.layer == platformLayer)
         {
             isOnPlatform = true;
         }
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform"))
+        //if (collision.gameObject.CompareTag("Platform"))
+        if (collision.gameObject.layer == platformLayer)
         {
             isOnPlatform = false;
         }
@@ -431,10 +451,11 @@ public class PlayerControl : Being
             }
 
             //regular jump
-            else if (isGrounded() && !isCrouching)
+            else if ((isGrounded() && !isCrouching) || isClimbing)
             {
                 Debug.Log("Jumping");
                 //rb.AddForce(new Vector2(0,JumpForce));
+                isClimbing = false;
                 rb.velocity = new Vector2(rb.velocity.x, JumpForce);
                 anim.SetTrigger("Jump");
             }
@@ -519,10 +540,10 @@ public class PlayerControl : Being
     #region Constant Checks
     private bool isGrounded()
     {
-        RaycastHit2D ray = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, groundLayer);
-        RaycastHit2D ray2 = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, platformLayer);
-        RaycastHit2D ray3 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(ColliderCheck.size.x, 1), 0, Vector2.down, 0.1f, groundLayer);
-        RaycastHit2D ray4 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(ColliderCheck.size.x, 1), 0, Vector2.down, 0.1f, platformLayer);
+        //RaycastHit2D ray = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, groundLayer);
+        //RaycastHit2D ray2 = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, platformLayer);
+        RaycastHit2D ray3 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(ColliderCheck.size.x, 1), 0, Vector2.down, 0, groundLayer);
+        RaycastHit2D ray4 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(ColliderCheck.size.x, 1), 0, Vector2.down, 0, platformLayer);
         //BoxCast(collider's centerpoint, size of the collider, rotation of box <at 0 because we dont wanna rotate, we want to check underneath the player - so point down, distance to position the virtual box, the layer we'll be checking for>
 
         Debug.DrawRay(GroundCheckLocation.transform.position, Vector2.down, Color.red, 1);
@@ -536,6 +557,18 @@ public class PlayerControl : Being
         //returns true if the ray hits a collider in the groundLayer.
     }
     
+
+    //Handles if you can climb or if you are no longer climbing. 
+    //"If you are climbing" is handled in Movement()
+    private bool canClimb()
+    {
+        RaycastHit2D ClimbRay = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, mountLayer);
+        bool c = ClimbRay.collider != null;
+
+        if (c == false) isClimbing = false;
+        return c;
+    }
+
     private bool isOnWall()
     {
         RaycastHit2D ray = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, new Vector2(facing[0], 0), 0.1f, wallLayer);
