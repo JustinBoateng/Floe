@@ -20,7 +20,8 @@ public class Health : MonoBehaviour
     [SerializeField] private Image currHealthBar;
 
 
-    PlayerControl playerRef;
+    Being BeingRef;
+    //PlayerControl playerRef;
     Rigidbody2D rbRef;
     [SerializeField] float[] tookDamageRecoil = new float[2];
 
@@ -31,16 +32,19 @@ public class Health : MonoBehaviour
     }
     private void Start()
     {
-        totalHealthBar.fillAmount = currentHealth / 10;
+        if(totalHealthBar)
+            totalHealthBar.fillAmount = currentHealth / 10;
         anim = GetComponent<Animator>();
 
         rbRef = GetComponent<Rigidbody2D>();
-        playerRef = GetComponent<PlayerControl>();
+        //playerRef = GetComponent<PlayerControl>();
+        BeingRef = GetComponent<Being>();
     }
 
     private void Update()
     {
-        currHealthBar.fillAmount = currentHealth / 10;
+        if(currHealthBar)
+            currHealthBar.fillAmount = currentHealth / 10;
         //Fill Amount can be between 1 and 0
 
         if (tookDamageRecoil[1] > 0)
@@ -50,8 +54,9 @@ public class Health : MonoBehaviour
     private void KnockbackPhysics()
     {
         rbRef.velocity = Vector2.zero;
-        Debug.Log(-1 * playerRef.facing[0] * DamageRecoil[0]);
-        rbRef.velocity = new Vector2(-1 * playerRef.facing[0] * DamageRecoil[0], DamageRecoil[1]);
+        //Debug.Log(-1 * playerRef.facing[0] * DamageRecoil[0]);
+        //rbRef.velocity = new Vector2(-1 * playerRef.facing[0] * DamageRecoil[0], DamageRecoil[1]);
+        rbRef.velocity = new Vector2(-1 * BeingRef.facing[0] * DamageRecoil[0], DamageRecoil[1]);
         //rbRef.AddForce(new Vector2(playerRef.facing[0] * DamageRecoil[0] * -1, DamageRecoil[1]));
         tookDamageRecoil[1] -= Time.deltaTime;
     }
@@ -61,17 +66,20 @@ public class Health : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth - _damage, 0, StartingHealth);
         //currentHealth will become cHealth - _damage, the least it can be is 0, the most it can be is startingHealth
 
-        PlayerControl playerRef = GetComponent<PlayerControl>();
-        Rigidbody2D rbRef = GetComponent<Rigidbody2D>();
+        //PlayerControl playerRef = GetComponent<PlayerControl>();
+        //Rigidbody2D rbRef = GetComponent<Rigidbody2D>();
 
 
         if (currentHealth > 0)
         {
             //Player Hurt Animation
-            playerRef.CooldownStart("Hurt");
-            playerRef.cantMove();
-            anim.SetTrigger("Hurt");
 
+            if (BeingRef.GetComponent<PlayerControl>())
+            {
+                BeingRef.GetComponent<PlayerControl>().CooldownStart("Hurt");
+                BeingRef.GetComponent<PlayerControl>().cantMove();
+                anim.SetTrigger("Hurt");
+            }
             tookDamageRecoil[1] = tookDamageRecoil[0];
         }
 

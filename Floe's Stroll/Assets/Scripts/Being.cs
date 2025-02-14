@@ -8,6 +8,8 @@ public abstract class Being : MonoBehaviour
 
     string Name;
 
+    [SerializeField] public int[] facing = new int[2];
+
     public void SetMaxAmmo(int i)
     {
         Ammo[0] = i; 

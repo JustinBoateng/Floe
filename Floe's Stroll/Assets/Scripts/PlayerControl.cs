@@ -59,7 +59,7 @@ public class PlayerControl : Being
 
     
     //[SerializeField] public int[] facing { get; private set; } = new int[2];
-    [SerializeField] public int[] facing = new int[2];
+    //[SerializeField] public int[] facing = new int[2];
     //0: horizontal facing, 1: vertical facing
     //instead of doing an entire get and set function, we can just do this.
 
