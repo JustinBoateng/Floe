@@ -8,6 +8,7 @@ public class Sight : MonoBehaviour
     [SerializeField] private BoxCollider2D BC;
     [SerializeField] private List<Being> beings = new List<Being>();
     [SerializeField] private bool PlayerLockOn;
+    [SerializeField] private GameObject Target;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,6 +29,7 @@ public class Sight : MonoBehaviour
         if (collision.tag == "Player")
         {
             PlayerLockOn = true;
+            Target = collision.gameObject;
         }
     }
 
@@ -37,6 +39,7 @@ public class Sight : MonoBehaviour
         if (collision.tag == "Player")
         {
             PlayerLockOn = false;
+            Target = null;
         }
 
     }
@@ -44,5 +47,10 @@ public class Sight : MonoBehaviour
     public bool LockOnStatus()
     {
         return PlayerLockOn;
+    }
+
+    public GameObject CurrentTarget()
+    {
+        return Target;
     }
 }

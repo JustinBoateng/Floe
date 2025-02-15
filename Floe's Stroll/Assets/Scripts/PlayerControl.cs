@@ -13,19 +13,19 @@ public class PlayerControl : Being
 
     private Animator anim;
     
-    Rigidbody2D rb;
+    //Rigidbody2D rb;
 
 
-    [SerializeField] Transform GroundCheckLocation;
-    [SerializeField] Transform MountCheckLocation;
+    //[SerializeField] Transform GroundCheckLocation;
+    //[SerializeField] Transform MountCheckLocation;
     
     [SerializeField] bool inputLock = false;
-    [SerializeField] BoxCollider2D ColliderCheck;// = new BoxCollider2D[2];
+    //[SerializeField] BoxCollider2D ColliderCheck;// = new BoxCollider2D[2];
     
-    [SerializeField] private LayerMask platformLayer;
-    [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private LayerMask wallLayer;
-    [SerializeField] private LayerMask mountLayer;
+    //[SerializeField] private LayerMask platformLayer;
+    //[SerializeField] private LayerMask groundLayer;
+    //[SerializeField] private LayerMask wallLayer;
+    //[SerializeField] private LayerMask mountLayer;
 
     [SerializeField] private float DropdownTimer = 0.25f;
 
@@ -113,7 +113,7 @@ public class PlayerControl : Being
     {
         rb = GetComponent<Rigidbody2D>();
         //ColliderChecks[0] = GetComponent<BoxCollider2D>();
-        ColliderCheck = GetComponent<BoxCollider2D>();
+        bc = GetComponent<BoxCollider2D>();
         anim = GetComponent<Animator>();
 
         //ColliderChecks[0] = GetComponent<CapsuleCollider2D>();
@@ -424,9 +424,9 @@ public class PlayerControl : Being
 
     private IEnumerator DisablePlayerCollider(float disableTime)
     {
-        ColliderCheck.enabled = false;
+        bc.enabled = false;
         yield return new WaitForSeconds(disableTime);
-        ColliderCheck.enabled = true;
+        bc.enabled = true;
     }
 
     #endregion
@@ -464,7 +464,7 @@ public class PlayerControl : Being
         }
 
         //Dropdown
-        if (context.performed && isCrouching && isOnPlatform &&  ColliderCheck.enabled == true)
+        if (context.performed && isCrouching && isOnPlatform &&  bc.enabled == true)
         {
             StartCoroutine(DisablePlayerCollider(DropdownTimer));
         }
@@ -538,7 +538,8 @@ public class PlayerControl : Being
 
 
     #region Constant Checks
-    private bool isGrounded()
+    /*
+     * private bool isGrounded()
     {
         //RaycastHit2D ray = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, groundLayer);
         //RaycastHit2D ray2 = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, platformLayer);
@@ -556,13 +557,13 @@ public class PlayerControl : Being
         return y;
         //returns true if the ray hits a collider in the groundLayer.
     }
-    
+    */
 
     //Handles if you can climb or if you are no longer climbing. 
     //"If you are climbing" is handled in Movement()
     private bool canClimb()
     {
-        RaycastHit2D ClimbRay = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, mountLayer);
+        RaycastHit2D ClimbRay = Physics2D.BoxCast(bc.bounds.center, bc.bounds.size, 0, Vector2.down, 0.1f, mountLayer);
         bool c = ClimbRay.collider != null;
 
         if (c == false) isClimbing = false;
@@ -571,7 +572,7 @@ public class PlayerControl : Being
 
     private bool isOnWall()
     {
-        RaycastHit2D ray = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, new Vector2(facing[0], 0), 0.1f, wallLayer);
+        RaycastHit2D ray = Physics2D.BoxCast(bc.bounds.center, bc.bounds.size, 0, new Vector2(facing[0], 0), 0.1f, wallLayer);
         //BoxCast(collider's centerpoint, size of the collider, rotation of box <at 0 because we dont wanna rotate, we want to check underneath the player - so point down, distance to position the virtual box, the layer we'll be checking for>
 
         return ray.collider != null;
@@ -634,16 +635,16 @@ public class PlayerControl : Being
                 isRolling = true;
             }
         isCrouching = true;
-        ColliderCheck.size = CrouchColliderDimensions;
-        ColliderCheck.offset = CrouchColliderOffset;
+        bc.size = CrouchColliderDimensions;
+        bc.offset = CrouchColliderOffset;
         //change the collider dimensions to Crouch
     }
 
     else
     {
         isCrouching = false;
-        ColliderCheck.size = BaseColliderDimensions;
-        ColliderCheck.offset = BaseColliderOffset;
+        bc.size = BaseColliderDimensions;
+        bc.offset = BaseColliderOffset;
     }
 
     //change the collider dimensions to regular

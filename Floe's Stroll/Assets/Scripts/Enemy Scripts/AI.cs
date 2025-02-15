@@ -2,28 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AI : MonoBehaviour
+public class AI : Being
 {
 
-    [SerializeField] int facing = 1;
+    //[SerializeField] int facing = 1;
+    /*
     [SerializeField] Transform GroundCheckLocation;
     [SerializeField] Transform MountCheckLocation;
-    [SerializeField] private BoxCollider2D bc;
-    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] protected BoxCollider2D bc;
+    [SerializeField] protected Rigidbody2D rb;
 
 
-    [SerializeField] private LayerMask platformLayer;
-    [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private LayerMask wallLayer;
-    [SerializeField] private LayerMask mountLayer;
+    [SerializeField] protected LayerMask platformLayer;
+    [SerializeField] protected LayerMask groundLayer;
+    [SerializeField] protected LayerMask wallLayer;
+    [SerializeField] protected LayerMask mountLayer;
 
     //isGrounded
-
+    */
 
     // Start is called before the first frame update
     void Start()
     {
-        facing = 1;           
+        facing[0] = 1;           
     }
 
     // Update is called once per frame
@@ -35,9 +36,12 @@ public class AI : MonoBehaviour
 
     }
 
-    private void facingCalc()
+    //put -1 to flip the facing. 
+    protected void facingCalc(int i)
     {
-        transform.localScale = new Vector3(facing, 1, 1);
+        if (i != 0)
+            facing[0] *= i;
+        transform.localScale = new Vector3(facing[0], 1, 1);
     }
 
     private bool isGrounded()
