@@ -1555,8 +1555,8 @@ Transform:
   m_GameObject: {fileID: 785428829}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -15.24815, y: -0.773365, z: -0.017421521}
-  m_LocalScale: {x: 20.411604, y: 19.11656, z: 2.3877}
+  m_LocalPosition: {x: -15.24815, y: 12.7625, z: -0.017421521}
+  m_LocalScale: {x: 20.411604, y: 46.187523, z: 2.3877}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1747527652}
@@ -1748,7 +1748,7 @@ Transform:
   m_GameObject: {fileID: 1224627463}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.21, y: 7.48, z: 0}
+  m_LocalPosition: {x: -1.21, y: 38.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2199,38 +2199,48 @@ MonoBehaviour:
   mountLayer:
     serializedVersion: 2
     m_Bits: 512
+  isOnPlatform: 0
+  gravityAdjust:
+  - 1.1
+  - 1.1
+  - 1.78
   facing: 0000000000000000
   hor: 0
   ver: 0
   Deadzone: 0.4
   inputLock: 0
-  ColliderCheck: {fileID: 0}
   DropdownTimer: 0.75
   BaseColliderOffset: {x: 0, y: 0}
   BaseColliderDimensions: {x: 1.062383, y: 1.994269}
   CrouchColliderOffset: {x: 0, y: -0.73}
   CrouchColliderDimensions: {x: 1.629251, y: 0.6012003}
-  VaultForce: {x: 10, y: 7}
+  VaultForce: {x: 15.25, y: 7}
   isCrouching: 0
-  isOnPlatform: 0
   isWallRunning: 0
   isClimbing: 0
   walking: 0
-  JumpForce: 9
   currSpeed: 0
   LockCountDown:
-  - 0.5
+  - 0.24
   - 0
   Speeds:
-  - 14
+  - 20
   - 7
   - 14
+  - 30
+  TopSpeed: 0
   WallJumpInfo:
   - 0.5
   - 0
-  - 4
-  - 4
+  - 6
+  - 6
   - 0.7
+  isJumping:
+  - 1.28
+  - 0
+  - 0
+  - 12
+  - 1.31
   isShooting:
   - 0.5
   - 0
@@ -2244,18 +2254,18 @@ MonoBehaviour:
   - 0
   - 25
   AirDashInfo:
-  - 1.2
+  - 0.25
   - 0
   - 1
   - 0
-  - 14
+  - 20
   isSliding:
   - 17
   - 0
   - 0
   - 25
   isVaulting:
-  - 2
+  - 0.2
   - 0
   - 0
   - 0
@@ -3734,6 +3744,8 @@ MonoBehaviour:
   mountLayer:
     serializedVersion: 2
     m_Bits: 512
+  isOnPlatform: 0
+  gravityAdjust: []
   facing: 0100000001000000
   LineOfSight: {fileID: 267966139}
   FarSight: {fileID: 166393912}

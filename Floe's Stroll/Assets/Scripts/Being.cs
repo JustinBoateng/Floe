@@ -16,6 +16,10 @@ public abstract class Being : MonoBehaviour
     [SerializeField] protected LayerMask wallLayer;
     [SerializeField] protected LayerMask mountLayer;
 
+    [SerializeField] protected bool isOnPlatform;
+
+    [SerializeField] protected float[] gravityAdjust;
+    //baserising, currrising, falling, 
 
     int[] Ammo = new int[2];
 
@@ -51,10 +55,31 @@ public abstract class Being : MonoBehaviour
 
         //bool y = ray.collider != null || ray2.collider != null;
         bool y = ray3.collider != null || ray4.collider != null;
-
+        isOnPlatform = ray4.collider != null;
         //Debug.Log(y);
 
         return y;
         //returns true if the ray hits a collider in the groundLayer.
     }
+
+    protected void GravityChange()
+    {
+        if (!isGrounded())
+        {
+            if (rb.velocity.y > 0)
+            {
+                gravityAdjust[1] = Mathf.Clamp(gravityAdjust[1] + Time.deltaTime, gravityAdjust[1], gravityAdjust[2]);
+                rb.gravityScale = gravityAdjust[1];
+            }
+            else if (rb.velocity.y <= 0)
+            {
+                gravityAdjust[1] = gravityAdjust[0];
+                rb.gravityScale = gravityAdjust[2];
+            }
+        }
+
+        else
+            rb.gravityScale = 1;
+    }
+
 }
