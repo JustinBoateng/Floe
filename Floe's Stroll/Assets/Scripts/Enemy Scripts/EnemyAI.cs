@@ -73,8 +73,7 @@ public class EnemyAI : AI
 
                 if (Atk_Countdown[1] <= 0 && AtkRange.LockOnStatus())
                 {
-                    CurrState = "Attack";
-                    Atk_Countdown[1] = Atk_Countdown[0];
+                    AttackSwitch(true);
                 }
 
                 else if (AtkRange.LockOnStatus())
@@ -101,9 +100,7 @@ public class EnemyAI : AI
                         Atk_Countdown[1] -= Time.deltaTime;
                         if (Atk_Countdown[1] <= 0)
                         {
-                            Atk_Countdown[1] = Atk_Countdown[0];
-                            CurrState = "Idle";
-                            WeaponStick.gameObject.SetActive(false);
+                            AttackSwitch(false);
                         } 
                         break;
                 }
@@ -129,5 +126,24 @@ public class EnemyAI : AI
             CurrState = "Idle";
             Target = null;
         }
+    }
+
+    private void AttackSwitch(bool b)
+    {
+        switch (b)
+        {
+            case true:
+                CurrState = "Attack";
+                Atk_Countdown[1] = Atk_Countdown[0];
+                break;
+
+            case false:
+                Atk_Countdown[1] = Atk_Countdown[0];
+                CurrState = "Idle";
+                WeaponStick.gameObject.SetActive(false);
+                break;
+                    
+        }
+
     }
 }

@@ -375,7 +375,7 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.UI.ref.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2022.3.30f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2022.3.30f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
-"Assets/Platform.cs"
+"Assets/Etc_/GameplayManager.cs"
 "Assets/Scripts/Being.cs"
 "Assets/Scripts/BulletClass.cs"
 "Assets/Scripts/CameraController.cs"
@@ -385,6 +385,7 @@
 "Assets/Scripts/Enemy Scripts/Sight.cs"
 "Assets/Scripts/Health/Health.cs"
 "Assets/Scripts/Health/HealthBar.cs"
+"Assets/Scripts/Platform.cs"
 "Assets/Scripts/PlayerControl.cs"
 -langversion:9.0
 /deterministic

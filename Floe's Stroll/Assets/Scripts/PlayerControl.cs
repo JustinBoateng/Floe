@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerControl : Being
 {
-
+    //[SerializeField] PlayerInput PI;
     [SerializeField] float hor;
     [SerializeField] float ver;
     [SerializeField] float Deadzone = 0.4f;
@@ -69,6 +69,7 @@ public class PlayerControl : Being
     [SerializeField] float[] isJumping = new float[3];
     ////0: Max, 1: Curr, 2: isJumping, 3: JumpForce
     // 4: minimum jump cutoff point. the higher this value, the higher the short jump
+    // 5: Jumping Drag (the rate of decreacing the upwards velocity as you SHORT jump upwards.) 
 
     [SerializeField] float[] isShooting = new float[2]; //used for the shooting animation
     //0: Max, 1: curr
@@ -128,17 +129,46 @@ public class PlayerControl : Being
 
         SetMaxAmmo(StartingAmmo);
         AirDashReplenish();
+
+        //EstablishController();
     }
 
+    /*
+    private void EstablishController()
+    {
+        PI = this.GetComponent<PlayerInput>();
+        //Debug.Log(PI.);
+        switch(PlayerNumber)
+        {
+            case 0:
+                PI.SwitchCurrentControlScheme("Gamepad");
+                PI.SwitchCurrentActionMap("Player");
+                break;
+            case 1:
+                PI.SwitchCurrentControlScheme("Gamepad 1");
+                PI.SwitchCurrentActionMap("Player1"); 
+                break;
+            case 2:
+                PI.SwitchCurrentControlScheme("Gamepad 2");
+                PI.SwitchCurrentActionMap("Player2"); 
+                break;
+
+
+        }
+    }
+    */
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log(Input.GetAxisRaw("Horizontal"));
+        //Debug.Log(Gamepad.all);
+        //Debug.Log("Player " + PlayerNumber + ": " + PI.currentControlScheme);
+        //Debug.Log("Player " + PlayerNumber + ": " + PI.currentActionMap);
+        //Debug.Log("Player " + PlayerNumber + ": " + Gamepad.current);
 
         VelocityRef = rb.velocity;
 
-        hor = Input.GetAxisRaw("Horizontal");
-        ver = Input.GetAxisRaw("Vertical");
+        //hor = Input.GetAxisRaw("Horizontal");
+        //ver = Input.GetAxisRaw("Vertical");
         //ver = -1;
         
         //Debug.Log("Horizonal: " + hor);
@@ -316,6 +346,7 @@ public class PlayerControl : Being
         {
             //rb.gravityScale = 1.5f;
 
+            //cap the spped of which you fall to the ground
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y, -Speeds[0]));
         }
 
@@ -326,12 +357,10 @@ public class PlayerControl : Being
         }
         */
 
-        //General Checks
+        //InputLock Dependent Checks
         if (!inputLock)
         {
             facingCalc();
-            WallMovementCheck(); // Checks if you're Wall Sliding and Wall Running
-            CrouchRollCheck(); //Checks if you're Crouching and Rolling
             {
                 //because CrouchCheck is checked only if we're not inputLocked, we can slide off of platforms smoothly
                 //isDashing[4] is set to false because we are not grounded, due to the cooldownCacl
@@ -339,6 +368,13 @@ public class PlayerControl : Being
                 //we go to the default state, with the default rb.velocity calculations, and the crouching dimensions, respectively...
             }
         }
+        
+        
+        //Checking for walls is done at all times
+        WallMovementCheck();
+        CrouchRollCheck(); 
+        //Checks if you're Crouching and Rolling. This should be outside InputLock too, so that we can have hor change while we are vaulting. We want to check if we're crouching EVEN IF we can't move. 
+
 
         //if jumping
         if (isJumping[2] > 0)
@@ -351,19 +387,24 @@ public class PlayerControl : Being
             //}
 
             //else
+
+
+            //if you hit the apex of your jump
             if (isJumping[1] <= 0 || rb.velocity.y <= 0)
             {
                 //rb.velocity = new Vector2(rb.velocity.x, 0);
                 isJumping[2] = 0;
             }
         }
+
         //isJumping[2] <= 0
         else
         {
             if (((isJumping[1] < isJumping[0] / isJumping[4]) || rb.velocity.y <= 0) && isJumping[1] > 0)
             {
-                isJumping[1] = 0;
-                rb.velocity = new Vector2(rb.velocity.x, 0);
+                isJumping[1] -= isJumping[5];
+
+                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y - isJumping[1]);
             }
 
             if (isJumping[1] == 0)
@@ -540,6 +581,28 @@ public class PlayerControl : Being
     #endregion
 
     #region Controller Functions
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+
+        float inputx = context.ReadValue<Vector2>().x;
+        float inputy = context.ReadValue<Vector2>().y;
+
+        if (inputx < -Deadzone) hor = -1;
+        else if (inputx > Deadzone) hor = 1;
+        else hor = 0;
+
+        if (inputy < -Deadzone) ver = -1;
+        else if (inputy > Deadzone) ver = 1;
+        else ver = 0;
+
+        //hor = context.ReadValue<Vector2>().x;
+        //ver = context.ReadValue<Vector2>().y;
+
+        
+    }
+
+
     public void onJump(InputAction.CallbackContext context)
     {
 
@@ -696,7 +759,7 @@ public class PlayerControl : Being
         //BoxCast(collider's centerpoint, size of the collider, rotation of box <at 0 because we dont wanna rotate, we want to check underneath the player - so point down, distance to position the virtual box, the layer we'll be checking for>
 
         bool y = ray.collider != null;
-        //Debug.Log(y);
+        Debug.Log(y);
         return y;
         //returns true if the ray hits a collider in the groundLayer.
     }
