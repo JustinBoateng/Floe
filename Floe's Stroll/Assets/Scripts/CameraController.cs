@@ -70,4 +70,9 @@ public class CameraController : MonoBehaviour
     {
         Player = g;
     }
+
+    public void setAhead(float a)
+    {
+        aheadDistance = a;
+    }
 }

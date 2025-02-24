@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class Being : MonoBehaviour
 {
 
-    [SerializeField] int PlayerNumber; //handles what player layer not to check for
+    //[SerializeField] int PlayerNumber; //handles what player layer not to check for
 
     [SerializeField] protected Transform GroundCheckLocation;
     [SerializeField] protected Transform MountCheckLocation;
@@ -31,7 +31,7 @@ public abstract class Being : MonoBehaviour
     [SerializeField] protected float[] gravityAdjust;
     //baserising, currrising, falling, 
 
-    int[] Ammo = new int[2];
+    [SerializeField] int[] Ammo = new int[2];
 
     string Name;
 

@@ -13,6 +13,8 @@ public class BulletClass : MonoBehaviour
     [SerializeField] float[] LifeExpectancy = {0,0,0};
 
     [SerializeField] public Being Signature;
+    [SerializeField] public int SignatureNumber;
+    [SerializeField] public int Power;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,6 +26,7 @@ public class BulletClass : MonoBehaviour
     {
         rb.velocity = new Vector2(xSpeed * facing[0], ySpeed * facing[1]);
         //Note; the ySpeed going in must always be positive, since facing[1] can be negative in the air.
+
         //this bullet's facing[0] can never be negative compared to the player's facing[0] IF the player is in the air.
         //hence the different treatment between facing[0] and facing[1]
         //When in the air, a bullet's facing[0] WILL Equal it's Signature's facing[0]
@@ -52,9 +55,10 @@ public class BulletClass : MonoBehaviour
         LifeExpectancy[2] = rate;
     }
 
-    public void setSignature(Being B)
+    public void setSignature(Being B, int i)
     {
         Signature = B;
+        SignatureNumber = i;
     }
     private void BulletDeterioration()
     {
@@ -64,5 +68,31 @@ public class BulletClass : MonoBehaviour
             Signature.AmmoCalc(1);
             Destroy(this.gameObject);
         }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.tag == "Player" && collision.name != Signature.name)
+        {
+            //Debug.Log(GameplayManager.GM);
+            //Debug.Log(SignatureNumber);
+            //Debug.Log(Power);
+            GameplayManager.GM.ScoreUpdate(SignatureNumber, Power);
+            Debug.Log(Signature.name + " Hit: " + collision.name);
+            Signature.AmmoCalc(1);
+            Destroy(this.gameObject);
+        } 
+        
+        if(collision.tag == "Ground" || collision.tag == "Wall")
+        {
+            //Debug.Log(GameplayManager.GM);
+            //Debug.Log(SignatureNumber);
+            //Debug.Log(Power);
+            Signature.AmmoCalc(1);
+            Destroy(this.gameObject);
+        }
+
+        //Destroy(this.gameObject);
+
     }
 }

@@ -7,6 +7,7 @@ TagManager:
   - Ground
   - Wall
   - Platform
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -44,9 +45,6 @@ TagManager:
   - name: Background
     uniqueID: 166101327
     locked: 0
-  - name: Foreground
-    uniqueID: 3737602203
-    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
@@ -55,4 +53,10 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 4193455921
+    locked: 0
+  - name: Bullets
+    uniqueID: 452944157
+    locked: 0
+  - name: Foreground
+    uniqueID: 3737602203
     locked: 0

@@ -6,7 +6,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerControl : Being
 {
+
     //[SerializeField] PlayerInput PI;
+    [SerializeField] int PlayerNumber;
     [SerializeField] float hor;
     [SerializeField] float ver;
     [SerializeField] float Deadzone = 0.4f;
@@ -157,8 +159,16 @@ public class PlayerControl : Being
         }
     }
     */
+    private void Update()
+    {
+        CooldownCalc();
+        AnimCalc();
+
+        AimMovement();
+
+    }
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         //Debug.Log(Gamepad.all);
         //Debug.Log("Player " + PlayerNumber + ": " + PI.currentControlScheme);
@@ -178,10 +188,6 @@ public class PlayerControl : Being
 
         Movement();
 
-        CooldownCalc();
-        AnimCalc();
-
-        AimMovement();
 
         SpeedManagement();
         //Debug.Log("Current Ammo: " + GetAmmo());
@@ -732,7 +738,7 @@ public class PlayerControl : Being
                 b.GetComponent<BulletClass>().setSpeed(BulletSpeeds[Aim].x , BulletSpeeds[Aim].y);
 
                 b.GetComponent<BulletClass>().setDeterioration(bulletDeterRate[0]);
-                b.GetComponent<BulletClass>().setSignature(this);
+                b.GetComponent<BulletClass>().setSignature(this, PlayerNumber);
             }
         }
     }
@@ -759,7 +765,7 @@ public class PlayerControl : Being
         //BoxCast(collider's centerpoint, size of the collider, rotation of box <at 0 because we dont wanna rotate, we want to check underneath the player - so point down, distance to position the virtual box, the layer we'll be checking for>
 
         bool y = ray.collider != null;
-        Debug.Log(y);
+        //Debug.Log(y);
         return y;
         //returns true if the ray hits a collider in the groundLayer.
     }
