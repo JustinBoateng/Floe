@@ -6,8 +6,9 @@ using UnityEngine.InputSystem;
 
 public class Health : MonoBehaviour
 {
-    [SerializeField] private float StartingHealth;
-    [SerializeField] public float currentHealth { get; private set; }
+    [SerializeField] public float StartingHealth;
+    [SerializeField] public float currentHealth;
+    //[SerializeField] public float currentHealth { get; private set; }
     //instead of doing an entire get and set function, we can just do this.
 
     [SerializeField] private Animator anim;
@@ -44,7 +45,7 @@ public class Health : MonoBehaviour
     private void Update()
     {
         if(currHealthBar)
-            currHealthBar.fillAmount = currentHealth / 10;
+            currHealthBar.fillAmount = currentHealth / StartingHealth;
         //Fill Amount can be between 1 and 0
 
         if (tookDamageRecoil[1] > 0)

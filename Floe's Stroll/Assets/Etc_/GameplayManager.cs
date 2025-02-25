@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class GameplayManager : MonoBehaviour
 {
     [SerializeField] public static GameplayManager GM;
-    
+
     [SerializeField] int numPlayers;
     [SerializeField] GameObject[] PlayerPrefabs;
     [SerializeField] int currPF = 0;
@@ -21,7 +21,11 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] int[] Score;
     [SerializeField] PlayerControl[] Players;
 
-
+    [SerializeField] bool GameOn = false;
+    [SerializeField] float[] Timer = new float [4];
+    [SerializeField] int Winner = 0;
+    [SerializeField] Health[] PlayerHealth; 
+    [SerializeField] HealthBar[] PlayerHealthBars;
     
     private void Awake()
     {
@@ -57,7 +61,10 @@ public class GameplayManager : MonoBehaviour
 
         PIU.playerPrefab = PlayerPrefabs[currPF];
 
-
+        PlayerHealth[0] = Players[0].GetComponent<Health>();
+        PlayerHealth[1] = Players[1].GetComponent<Health>();
+        PlayerHealthBars[0].setHealth(PlayerHealth[0]);
+        PlayerHealthBars[1].setHealth(PlayerHealth[1]);
     }
 
     // Update is called once per frame

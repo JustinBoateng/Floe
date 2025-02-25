@@ -74,10 +74,13 @@ public class BulletClass : MonoBehaviour
     {
         if(collision.tag == "Player" && collision.name != Signature.name)
         {
-            //Debug.Log(GameplayManager.GM);
-            //Debug.Log(SignatureNumber);
-            //Debug.Log(Power);
+            Debug.Log(GameplayManager.GM);
+            Debug.Log(SignatureNumber);
+            Debug.Log(Power);
             GameplayManager.GM.ScoreUpdate(SignatureNumber, Power);
+            
+            collision.GetComponent<Health>().TakeDamage(Power);
+            
             Debug.Log(Signature.name + " Hit: " + collision.name);
             Signature.AmmoCalc(1);
             Destroy(this.gameObject);
