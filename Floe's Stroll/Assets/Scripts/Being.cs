@@ -22,7 +22,7 @@ public abstract class Being : MonoBehaviour
     [SerializeField] protected LayerMask PlayerLayer;
     //[SerializeField] protected LayerMask PlayerLayer2;
     //[SerializeField] protected LayerMask PlayerLayer3;
-    
+
 
     [SerializeField] protected bool isOnPlatform;
     [SerializeField] protected bool isOnBeing;
@@ -39,7 +39,7 @@ public abstract class Being : MonoBehaviour
 
     public void SetMaxAmmo(int i)
     {
-        Ammo[0] = i; 
+        Ammo[0] = i;
         Ammo[1] = Ammo[0] = i;
     }
 
@@ -102,6 +102,11 @@ public abstract class Being : MonoBehaviour
 
         else
             rb.gravityScale = 1;
+    }
+
+    public void setVelocity(Vector2 V)
+    {
+        rb.velocity = V;
     }
 
 }

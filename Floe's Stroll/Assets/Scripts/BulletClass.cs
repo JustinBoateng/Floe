@@ -15,6 +15,10 @@ public class BulletClass : MonoBehaviour
     [SerializeField] public Being Signature;
     [SerializeField] public int SignatureNumber;
     [SerializeField] public int Power;
+    [SerializeField] public Vector2 Knockback;
+
+    [SerializeField] public bool BreaksOnGround;
+    [SerializeField] public bool BreaksOnWall;
     // Start is called before the first frame update
     void Start()
     {
@@ -48,6 +52,31 @@ public class BulletClass : MonoBehaviour
         ySpeed= y;
     }
 
+    public void setDirection(int i)
+    {
+        switch (i)
+        {
+
+            case 1:
+                xSpeed *= 1;
+                ySpeed *= 0;
+                break;
+            case 2:
+                xSpeed *= -1;
+                ySpeed *= 0;
+                break;            
+            case 3:
+                xSpeed *= 0;
+                ySpeed *= 1;
+                break;            
+            case 4:
+                xSpeed *= 0;
+                ySpeed *= 1;
+                break;            
+
+        }
+    }
+
     public void setDeterioration(float rate)
     {
         LifeExpectancy[0] = 100;
@@ -66,7 +95,7 @@ public class BulletClass : MonoBehaviour
         if (LifeExpectancy[1] >= LifeExpectancy[0])
         {
             Signature.AmmoCalc(1);
-            Destroy(this.gameObject);
+            Crash();
         }
     }
 
@@ -82,20 +111,34 @@ public class BulletClass : MonoBehaviour
             collision.GetComponent<Health>().TakeDamage(Power);
             
             Debug.Log(Signature.name + " Hit: " + collision.name);
-            Signature.AmmoCalc(1);
-            Destroy(this.gameObject);
+
+            collision.GetComponent<Being>().setVelocity(Vector2.zero);
+            collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
+            Crash();
         } 
         
-        if(collision.tag == "Ground" || collision.tag == "Wall")
+        if((collision.tag == "Ground"  && BreaksOnGround) || (collision.tag == "Wall" && BreaksOnWall))
         {
             //Debug.Log(GameplayManager.GM);
             //Debug.Log(SignatureNumber);
-            //Debug.Log(Power);
-            Signature.AmmoCalc(1);
-            Destroy(this.gameObject);
+            //Debug.Log(Power);            
+            Crash();
         }
 
+        if(collision.tag == "Bullet")
+        {
+            if (collision.GetComponent<BulletClass>().Power >= Power)
+                Crash();
+        }
         //Destroy(this.gameObject);
 
     }
+
+    private void Crash()
+    {
+        //play Animation coroutine
+        Signature.AmmoCalc(1);
+        Destroy(this.gameObject);
+    }
+
 }

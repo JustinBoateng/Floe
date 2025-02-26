@@ -86,13 +86,11 @@ public class Health : MonoBehaviour
 
         else
         {
-            if(!dead) { }
+            
             {
-                //Player dead Animation
-                //anim.SetTrigger("Die")
-                GetComponent<PlayerControl>().enabled = false;
+                GetComponent<PlayerControl>().CooldownStart("KO'd");
                 //make it so that the player can't control the character anymore
-                dead = true;
+                //dead = true;
             }
         }
     }

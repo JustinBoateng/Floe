@@ -2736,6 +2736,7 @@ MonoBehaviour:
   Aim: 0
   StartingAmmo: 3
   currentBullet: 0
+  ChargeFactor: []
   VelocityRef: {x: 0, y: 0}
 --- !u!50 &1435795762
 Rigidbody2D:
@@ -4885,7 +4886,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c172c9d96e40f4344b030dd6c2d344ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartingHealth: 50
+  StartingHealth: 3
   currentHealth: 0
   anim: {fileID: 0}
   dead: 0
@@ -5215,6 +5216,7 @@ MonoBehaviour:
   - 0
   - 0
   isKO:
+  - 1.28
   - 0
   - 0
   bulletDeterRate:
@@ -5227,6 +5229,8 @@ MonoBehaviour:
   - {fileID: 715592751}
   BulletReferences:
   - {fileID: 6183745305353792697, guid: 876006d358ed50b47891138f336d8cf9, type: 3}
+  - {fileID: 1743716657270876460, guid: d5881658ac06180499f3ea5be0d0e2b7, type: 3}
+  - {fileID: 2574787473599357658, guid: c079390dd87a2714ba6519a328bfb1a2, type: 3}
   BulletSpeeds:
   - {x: 5, y: 0}
   - {x: 5, y: 0}
@@ -5236,6 +5240,10 @@ MonoBehaviour:
   Aim: 0
   StartingAmmo: 5
   currentBullet: 0
+  ChargeFactor:
+  - 2
+  - 0
+  - 0
   VelocityRef: {x: 0, y: 0}
 --- !u!50 &1846355623
 Rigidbody2D:
@@ -5466,7 +5474,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c172c9d96e40f4344b030dd6c2d344ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartingHealth: 50
+  StartingHealth: 3
   currentHealth: 0
   anim: {fileID: 0}
   dead: 0
@@ -5796,6 +5804,7 @@ MonoBehaviour:
   - 0
   - 0
   isKO:
+  - 1.28
   - 0
   - 0
   bulletDeterRate:
@@ -5808,6 +5817,8 @@ MonoBehaviour:
   - {fileID: 1726774214}
   BulletReferences:
   - {fileID: 6183745305353792697, guid: 876006d358ed50b47891138f336d8cf9, type: 3}
+  - {fileID: 1743716657270876460, guid: d5881658ac06180499f3ea5be0d0e2b7, type: 3}
+  - {fileID: 2574787473599357658, guid: c079390dd87a2714ba6519a328bfb1a2, type: 3}
   BulletSpeeds:
   - {x: 5, y: 0}
   - {x: 5, y: 0}
@@ -5817,6 +5828,10 @@ MonoBehaviour:
   Aim: 0
   StartingAmmo: 5
   currentBullet: 0
+  ChargeFactor:
+  - 2
+  - 0
+  - 0
   VelocityRef: {x: 0, y: 0}
 --- !u!50 &1871351110
 Rigidbody2D:

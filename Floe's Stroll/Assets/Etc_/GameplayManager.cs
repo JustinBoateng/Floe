@@ -88,4 +88,30 @@ public class GameplayManager : MonoBehaviour
     {
         Score[player] += points;
     }
+
+    
+    public void PlayerDown(int i)
+    {
+        if(Winner == 0)
+            switch (i)
+            {
+                case 1:
+                    Winner = 2;
+                    break;
+                case 2:
+                    Winner = 1;
+                    break;
+            }
+
+        if (Winner != 0)
+        {
+            GameOn = false;
+            if(numPlayers <= 1)
+            {
+                //dont have the camera track the player
+                CameraCont.setTarget(null);
+            }
+        }
+    }
+
 }

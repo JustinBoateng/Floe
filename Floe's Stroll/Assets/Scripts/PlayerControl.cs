@@ -68,6 +68,7 @@ public class PlayerControl : Being
     //instead of doing an entire get and set function, we can just do this.
 
 
+    //[SerializeField] float[] isKOd = new float[3];
     [SerializeField] float[] isJumping = new float[3];
     ////0: Max, 1: Curr, 2: isJumping, 3: JumpForce
     // 4: minimum jump cutoff point. the higher this value, the higher the short jump
@@ -96,7 +97,7 @@ public class PlayerControl : Being
     [SerializeField] float SlopeCoefficient = 0.7f;
     
     [SerializeField] float[] isHurt = new float[2]; //used for the Hurt animation
-    [SerializeField] float[] isKO = new float[2]; //used for the KO animation
+    [SerializeField] float[] isKO = new float[3]; //used for the KO animation
      
     //[SerializeField] int[] bulletSpeed = new int[2];
     //0: horizontal Speed, 1: vertical Speed
@@ -115,6 +116,8 @@ public class PlayerControl : Being
 
 
     [SerializeField] int currentBullet;
+    [SerializeField] float[] ChargeFactor;
+    //[Max, Curr, isCharging]
     // Start is called before the first frame update
 
     [SerializeField] Vector2 VelocityRef;
@@ -123,6 +126,7 @@ public class PlayerControl : Being
         rb = GetComponent<Rigidbody2D>();
         //ColliderChecks[0] = GetComponent<BoxCollider2D>();
         bc = GetComponent<BoxCollider2D>();
+        bc.enabled = true;
         anim = GetComponent<Animator>();
 
         //ColliderChecks[0] = GetComponent<CapsuleCollider2D>();
@@ -132,6 +136,8 @@ public class PlayerControl : Being
         SetMaxAmmo(StartingAmmo);
         AirDashReplenish();
 
+        //turns true when cantMove() is called, or when player HP hits zero
+        inputLock = false;
         //EstablishController();
     }
 
@@ -255,7 +261,14 @@ public class PlayerControl : Being
                 }
                 cantMove();
                 break;
-
+            case "KO'd":
+                bc.enabled = false;
+                isKO[1] = isKO[0];
+                isKO[2] = 1;
+                rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
+                inputLock = true;
+                GameplayManager.GM.PlayerDown(PlayerNumber);
+                break;
         }
     }
     private void CooldownCalc()
@@ -266,6 +279,7 @@ public class PlayerControl : Being
         LockCountDown[1] = Mathf.Clamp(LockCountDown[1] - Time.deltaTime, 0, LockCountDown[0]);
         
         isJumping[1] = Mathf.Clamp(isJumping[1] - Time.deltaTime, 0, isJumping[0]);
+        isKO[1] = Mathf.Clamp(isKO[1] - Time.deltaTime, 0, isKO[0]);
         
         isShooting[1] = Mathf.Clamp(isShooting[1] - Time.deltaTime, 0, isShooting[0]);
         WallJumpInfo[1] = Mathf.Clamp(WallJumpInfo[1] - Time.deltaTime, 0, WallJumpInfo[0]);
@@ -287,6 +301,10 @@ public class PlayerControl : Being
         //{
         //    AirDashInfo[5] = 0;
         //}
+
+
+        if (ChargeFactor[2] == 1)
+            ChargeFactor[1] = Mathf.Clamp(ChargeFactor[1] + Time.deltaTime, 0, ChargeFactor[0]);
 
         if (isGrounded())
         {
@@ -338,6 +356,9 @@ public class PlayerControl : Being
 
         anim.SetFloat("isVaulting", isVaulting[1]);
         anim.SetFloat("isSliding", isSliding[1]);
+
+        //anim.SetFloat("isCharging", ChargeFactor[1]);
+        anim.SetFloat("isKO", isKO[2]);
     }
     private void Movement()
     {
@@ -378,9 +399,36 @@ public class PlayerControl : Being
         
         //Checking for walls is done at all times
         WallMovementCheck();
-        CrouchRollCheck(); 
+        CrouchRollCheck();
         //Checks if you're Crouching and Rolling. This should be outside InputLock too, so that we can have hor change while we are vaulting. We want to check if we're crouching EVEN IF we can't move. 
 
+        //if KO'd
+        if (isKO[2] == 1)
+        {
+            //pop the player up
+
+            if (isKO[1] <= 0 || rb.velocity.y <= 0)
+            {
+                //rb.velocity = new Vector2(rb.velocity.x, 0);
+                isKO[2] = 2;
+            }
+        }
+
+        if (isKO[2] == 2)
+        {
+            if (((isKO[1] < isJumping[0] / isJumping[4]) || rb.velocity.y <= 0) && isKO[1] > 0)
+            {
+                isKO[1] -= isJumping[5];
+
+                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y - isJumping[1]);
+            }
+
+            if (isJumping[1] == 0)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y);
+            }
+
+        }
 
         //if jumping
         if (isJumping[2] > 0)
@@ -714,10 +762,24 @@ public class PlayerControl : Being
 
     public void onShoot(InputAction.CallbackContext context)
     {
-        if (context.started && isHurt[1] == 0) //We can shoot because we are not hurt
+        
+        if(context.started && isHurt[1] == 0) 
+        {
+            //
+            ChargeFactor[2] = 1;
+            //Make sure ChargeFactor[0] is the same as the amount of different bullets you can charge to
+
+            //play Charge animation
+        }
+        
+        if (context.canceled && isHurt[1] == 0) //We can shoot because we are not hurt
         {
             if (GetAmmo() > 0)
             {
+
+                currentBullet = (int) ChargeFactor[1];
+
+                //currentBullet = (int)Mathf.Clamp((float) context.time, 0, ChargeFactor[0]);
                 AmmoCalc(-1);
                 CooldownStart("Shoot");
 
@@ -735,10 +797,14 @@ public class PlayerControl : Being
 
                 //b.GetComponent<BulletClass>().setSpeed(bulletSpeed[0] + movSpeed, bulletSpeed[1]);
                 //b.GetComponent<BulletClass>().setSpeed(BulletSpeeds[Aim].x + (movSpeed * facing[0]), BulletSpeeds[Aim].y);
-                b.GetComponent<BulletClass>().setSpeed(BulletSpeeds[Aim].x , BulletSpeeds[Aim].y);
+                //b.GetComponent<BulletClass>().setSpeed(BulletSpeeds[Aim].x , BulletSpeeds[Aim].y);
+                b.GetComponent<BulletClass>().setDirection(Aim);
 
                 b.GetComponent<BulletClass>().setDeterioration(bulletDeterRate[0]);
                 b.GetComponent<BulletClass>().setSignature(this, PlayerNumber);
+
+                ChargeFactor[1] = 0;
+                ChargeFactor[2] = 0;
             }
         }
     }
