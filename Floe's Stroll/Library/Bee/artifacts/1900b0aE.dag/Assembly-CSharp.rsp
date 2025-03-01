@@ -379,6 +379,7 @@
 "Assets/Scripts/Being.cs"
 "Assets/Scripts/BulletClass.cs"
 "Assets/Scripts/CameraController.cs"
+"Assets/Scripts/Clock.cs"
 "Assets/Scripts/Door.cs"
 "Assets/Scripts/Enemy Scripts/AI.cs"
 "Assets/Scripts/Enemy Scripts/EnemyAI.cs"

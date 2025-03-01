@@ -127,8 +127,9 @@ public class BulletClass : MonoBehaviour
 
         if(collision.tag == "Bullet")
         {
-            if (collision.GetComponent<BulletClass>().Power >= Power)
-                Crash();
+            if(collision.GetComponent<BulletClass>().Signature != Signature)
+                if (collision.GetComponent<BulletClass>().Power >= Power)
+                    Crash();
         }
         //Destroy(this.gameObject);
 

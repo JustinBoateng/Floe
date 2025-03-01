@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
 public class GameplayManager : MonoBehaviour
 {
     [SerializeField] public static GameplayManager GM;
@@ -22,11 +23,16 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] PlayerControl[] Players;
 
     [SerializeField] bool GameOn = false;
-    [SerializeField] float[] Timer = new float [4];
     [SerializeField] int Winner = 0;
     [SerializeField] Health[] PlayerHealth; 
     [SerializeField] HealthBar[] PlayerHealthBars;
-    
+
+    [SerializeField] float[] Timer = new float[4];
+    [SerializeField] Clock ClockRef;
+    //[Max Minutes, Minutes, Seconds, Milliseconds]
+
+
+
     private void Awake()
     {
         if (GM == null)
@@ -65,12 +71,15 @@ public class GameplayManager : MonoBehaviour
         PlayerHealth[1] = Players[1].GetComponent<Health>();
         PlayerHealthBars[0].setHealth(PlayerHealth[0]);
         PlayerHealthBars[1].setHealth(PlayerHealth[1]);
+
+        Timer[1] = Timer[0];
     }
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(Input.GetJoystickNames());
+        //Debug.Log(Input.GetJoystickNames());
+        TimeCalc();
     }
 
     public void NextPlayerSpawn()
@@ -112,6 +121,52 @@ public class GameplayManager : MonoBehaviour
                 CameraCont.setTarget(null);
             }
         }
+    }
+
+    private void TimeCalc()
+    {
+        //if (Timer[3] <= 0)
+        if ((int)(Timer[3]) > (int)(Timer[3] - UnityEngine.Time.deltaTime) || Timer[3] < 0)
+        {
+            if (Timer[2] <= 0)
+            {
+                if (Timer[1] <= 0)
+                {
+                    GameOn = false;
+                }
+
+                else Timer[1] -= 1;
+
+
+                if (GameOn)
+                {
+                    Timer[2] = 59;
+                }
+
+            }
+
+            else
+            {
+                if (GameOn)
+                    Timer[2] -= 1;
+            }
+
+            if (GameOn)
+            {
+                Timer[3] = 99;
+            }
+        }
+
+        if (GameOn)
+        {
+            //if ()
+            //{
+            //    Timer[2] -= 1;
+            //}
+            Timer[3] -= UnityEngine.Time.deltaTime;
+        }
+
+        ClockRef.ClockUpdate(Timer[1], Timer[2], Timer[3]);
     }
 
 }
