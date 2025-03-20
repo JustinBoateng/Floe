@@ -20,11 +20,10 @@ public class EnemyAI : AI
     [SerializeField] GameObject Target;
     [SerializeField] GameObject WeaponStick;
 
-
-
-
     void Start()
     {
+        BeingStart();
+
         CurrState = "Idle";
         WeaponStick.gameObject.SetActive(false);
     }

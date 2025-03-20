@@ -4,39 +4,12 @@ using UnityEngine;
 
 public class AI : Being
 {
-
-    //[SerializeField] int facing = 1;
-    /*
-    [SerializeField] Transform GroundCheckLocation;
-    [SerializeField] Transform MountCheckLocation;
-    [SerializeField] protected BoxCollider2D bc;
-    [SerializeField] protected Rigidbody2D rb;
-
-
-    [SerializeField] protected LayerMask platformLayer;
-    [SerializeField] protected LayerMask groundLayer;
-    [SerializeField] protected LayerMask wallLayer;
-    [SerializeField] protected LayerMask mountLayer;
-
-    //isGrounded
-    */
-
     // Start is called before the first frame update
     void Start()
     {
-        facing[0] = 1;           
+      
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        //facing = hor >= 0 ? 1 : -1;
-
-        
-
-    }
-
-    //put -1 to flip the facing. 
     protected void facingCalc(int i)
     {
         if (i != 0)

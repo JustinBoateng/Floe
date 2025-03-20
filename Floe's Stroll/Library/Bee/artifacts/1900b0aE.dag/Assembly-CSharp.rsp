@@ -377,6 +377,7 @@
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2022.3.30f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 "Assets/Etc_/GameplayManager.cs"
 "Assets/Scripts/Being.cs"
+"Assets/Scripts/Blade.cs"
 "Assets/Scripts/BulletClass.cs"
 "Assets/Scripts/CameraController.cs"
 "Assets/Scripts/Clock.cs"
@@ -386,8 +387,16 @@
 "Assets/Scripts/Enemy Scripts/Sight.cs"
 "Assets/Scripts/Health/Health.cs"
 "Assets/Scripts/Health/HealthBar.cs"
+"Assets/Scripts/Hitbox.cs"
+"Assets/Scripts/InputScripts/PlayerControl.cs"
+"Assets/Scripts/InputScripts/PlayerInputHandler.cs"
+"Assets/Scripts/MenuManager.cs"
+"Assets/Scripts/Oil&WaterMenu/OWMenuManager.cs"
+"Assets/Scripts/Oil&WaterMenu/PlayerControllerRep.cs"
 "Assets/Scripts/Platform.cs"
-"Assets/Scripts/PlayerControl.cs"
+"Assets/Scripts/TitleScreen Scripts/TitleScreenManager.cs"
+"Assets/Scripts/TitleScreen Scripts/WipeManager.cs"
+"Assets/Scripts/TransitionManager.cs"
 -langversion:9.0
 /deterministic
 /optimize+

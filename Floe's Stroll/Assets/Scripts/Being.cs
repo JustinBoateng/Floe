@@ -5,24 +5,18 @@ using UnityEngine;
 public abstract class Being : MonoBehaviour
 {
 
-    //[SerializeField] int PlayerNumber; //handles what player layer not to check for
-
     [SerializeField] protected Transform GroundCheckLocation;
     [SerializeField] protected Transform MountCheckLocation;
-    [SerializeField] protected BoxCollider2D bc;
+    [SerializeField]protected BoxCollider2D bc;
     [SerializeField] protected Rigidbody2D rb;
-    //[SerializeField] BoxCollider2D bc;// = new BoxCollider2D[2];
+    [SerializeField] protected Animator anim;
 
     [SerializeField] protected LayerMask platformLayer;
     [SerializeField] protected LayerMask groundLayer;
     [SerializeField] protected LayerMask wallLayer;
     [SerializeField] protected LayerMask mountLayer;
     [SerializeField] protected LayerMask beingLayer;
-
     [SerializeField] protected LayerMask PlayerLayer;
-    //[SerializeField] protected LayerMask PlayerLayer2;
-    //[SerializeField] protected LayerMask PlayerLayer3;
-
 
     [SerializeField] protected bool isOnPlatform;
     [SerializeField] protected bool isOnBeing;
@@ -36,6 +30,17 @@ public abstract class Being : MonoBehaviour
     string Name;
 
     [SerializeField] public int[] facing = new int[2];
+
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        bc = GetComponent<BoxCollider2D>();
+        anim = GetComponent<Animator>();
+
+        bc.enabled = true;
+        facing[0] = 1;
+    }
 
     public void SetMaxAmmo(int i)
     {
@@ -55,30 +60,20 @@ public abstract class Being : MonoBehaviour
 
     protected bool isGrounded()
     {
-        //RaycastHit2D ray = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, groundLayer);
-        //RaycastHit2D ray2 = Physics2D.BoxCast(ColliderCheck.bounds.center, ColliderCheck.bounds.size, 0, Vector2.down, 0.1f, platformLayer);
         RaycastHit2D ray3 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, groundLayer);
         RaycastHit2D ray4 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, platformLayer);
         RaycastHit2D ray5 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, beingLayer);
-        //BoxCast(collider's centerpoint, size of the collider, rotation of box <at 0 because we dont wanna rotate, we want to check underneath the player - so point down, distance to position the virtual box, the layer we'll be checking for>
-        //RaycastHit2D ray6 = Physics2D.Raycast(GroundCheckLocation.transform.position, Vector2.down, 0.04f,  beingLayer);
 
 
         Debug.DrawRay(GroundCheckLocation.transform.position, Vector2.down, Color.red, 1);
 
         RaycastHit2D PRay1 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, PlayerLayer);
-        //RaycastHit2D PRay2 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, PlayerLayer2);
-        //RaycastHit2D PRay3 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, PlayerLayer3);
 
-        //bool y = ray.collider != null || ray2.collider != null;
         isOnBeing = (ray5.collider != null) && (ray5.collider.name != this.name);
         isOnPlatform = ray4.collider != null;
         isOnPlayer = PRay1.collider;// != null && PRay2.collider && PRay3.collider != null;
 
         bool y = ray3.collider != null || isOnPlatform || isOnBeing || isOnPlayer;
-        //Debug.Log(this.name + " is touching " + ray5.collider.name);
-        //if(this.name == ray5.collider.name)
-        //    Debug.Log(this.name + "is touching themselves.");
 
         return y;
         //returns true if the ray hits a collider in the groundLayer.
@@ -109,4 +104,15 @@ public abstract class Being : MonoBehaviour
         rb.velocity = V;
     }
 
+
+    public void BeingStart()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        bc = GetComponent<BoxCollider2D>();
+        anim = GetComponent<Animator>();
+
+        bc.enabled = true;
+        facing[0] = 1;
+    }
+    //use this just in case a class that derives from this one has its own Start Function and you don't want these steps to be overwritten
 }

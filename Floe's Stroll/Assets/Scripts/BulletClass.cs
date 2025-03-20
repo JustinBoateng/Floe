@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BulletClass : MonoBehaviour
+public class BulletClass : Hitbox
 {
 
     [SerializeField] private float xSpeed;
@@ -12,10 +12,7 @@ public class BulletClass : MonoBehaviour
 
     [SerializeField] float[] LifeExpectancy = {0,0,0};
 
-    [SerializeField] public Being Signature;
-    [SerializeField] public int SignatureNumber;
-    [SerializeField] public int Power;
-    [SerializeField] public Vector2 Knockback;
+
 
     [SerializeField] public bool BreaksOnGround;
     [SerializeField] public bool BreaksOnWall;
@@ -46,12 +43,6 @@ public class BulletClass : MonoBehaviour
         facing[1] = y;
     }
     
-    public void setSpeed(float x, float y)
-    {
-        xSpeed = x;
-        ySpeed= y;
-    }
-
     public void setDirection(int i)
     {
         switch (i)
