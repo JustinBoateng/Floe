@@ -4079,7 +4079,8 @@ MonoBehaviour:
   PlayerNumber: 0
   hor: 0
   ver: 0
-  Deadzone: 0.4
+  Deadzonex: 0.4
+  Deadzoney: 0.7
   inputLock: 0
   DropdownTimer: 0.75
   VelocityRef: {x: 0, y: 0}
@@ -4163,6 +4164,8 @@ MonoBehaviour:
   - {fileID: 670258660}
   BulletReferences:
   - {fileID: 6183745305353792697, guid: 876006d358ed50b47891138f336d8cf9, type: 3}
+  - {fileID: 1743716657270876460, guid: d5881658ac06180499f3ea5be0d0e2b7, type: 3}
+  - {fileID: 2574787473599357658, guid: c079390dd87a2714ba6519a328bfb1a2, type: 3}
   BulletSpeeds:
   - {x: 5, y: 0}
   - {x: 5, y: 0}
@@ -5699,7 +5702,7 @@ GameObject:
   - component: {fileID: 1761984266}
   m_Layer: 10
   m_Name: Enemy #1
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5833,6 +5836,9 @@ MonoBehaviour:
   EnemyType: FootSoldier
   Target: {fileID: 0}
   WeaponStick: {fileID: 1819329453}
+  Hitstun: 0
+  HitstunMultiplier: 0.5
+  HitstunArmor: 0300000000000000
 --- !u!50 &1761984264
 Rigidbody2D:
   serializedVersion: 4
@@ -5938,7 +5944,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c172c9d96e40f4344b030dd6c2d344ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartingHealth: 5
+  StartingHealth: 10
   currentHealth: 0
   anim: {fileID: 1761984266}
   dead: 0
@@ -6678,7 +6684,8 @@ MonoBehaviour:
   PlayerNumber: 2
   hor: 0
   ver: 0
-  Deadzone: 0.4
+  Deadzonex: 0.4
+  Deadzoney: 0.4
   inputLock: 0
   DropdownTimer: 0.75
   VelocityRef: {x: 0, y: 0}
@@ -7267,7 +7274,8 @@ MonoBehaviour:
   PlayerNumber: 1
   hor: 0
   ver: 0
-  Deadzone: 0.4
+  Deadzonex: 0.4
+  Deadzoney: 0.4
   inputLock: 0
   DropdownTimer: 0.75
   VelocityRef: {x: 0, y: 0}

@@ -10,7 +10,8 @@ public class PlayerControl : Being
     [SerializeField] int PlayerNumber;
     [SerializeField] float hor;
     [SerializeField] float ver;
-    [SerializeField] float Deadzone = 0.4f;
+    [SerializeField] float Deadzonex = 0.4f;
+    [SerializeField] float Deadzoney = 0.4f;
 
     [SerializeField] bool inputLock = false;
 
@@ -374,7 +375,7 @@ public class PlayerControl : Being
         //---Set up seperate if-else chain below
 
         //if climbing
-        if (canClimb() && Mathf.Abs(ver) >= Deadzone || isClimbing)
+        if (canClimb() && Mathf.Abs(ver) >= Deadzoney || isClimbing)
         {
             Debug.Log("Climbing");
             AirDashReplenish(); //replenish airdash when climbing
@@ -472,12 +473,12 @@ public class PlayerControl : Being
         float inputx = context.ReadValue<Vector2>().x;
         float inputy = context.ReadValue<Vector2>().y;
 
-        if (inputx < -Deadzone) hor = -1;
-        else if (inputx > Deadzone) hor = 1;
+        if (inputx < -Deadzonex) hor = -1;
+        else if (inputx > Deadzonex) hor = 1;
         else hor = 0;
 
-        if (inputy < -Deadzone) ver = -1;
-        else if (inputy > Deadzone) ver = 1;
+        if (inputy < -Deadzoney) ver = -1;
+        else if (inputy > Deadzoney) ver = 1;
         else ver = 0;
 
     }
@@ -627,9 +628,9 @@ public class PlayerControl : Being
     {
         if (hor == -facing[0] && !isGrounded())  Aim = 2;
 
-        else if (ver >= Deadzone) Aim = 3;
+        else if (ver >= Deadzoney) Aim = 3;
 
-        else if (ver <= -Deadzone) Aim = 4;
+        else if (ver <= -Deadzoney) Aim = 4;
         
         else Aim = 1;
 
@@ -701,7 +702,7 @@ public class PlayerControl : Being
 
     private void CrouchRollCheck()
     {
-        if (ver <= -Deadzone && isGrounded())
+        if (ver <= -Deadzoney && isGrounded())
         {
                 if (isDashing[2] == 1 && Mathf.Abs(rb.velocity.x) > Mathf.Abs(facing[0]))
                 {

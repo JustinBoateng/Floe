@@ -92,19 +92,32 @@ public class BulletClass : Hitbox
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.tag == "Player" && collision.name != Signature.name)
+        if((collision.tag == "Player" || collision.tag == "Enemy") && collision.name != Signature.name)
         {
-            Debug.Log(GameplayManager.GM);
-            Debug.Log(SignatureNumber);
-            Debug.Log(Power);
-            GameplayManager.GM.ScoreUpdate(SignatureNumber, Power);
-            
+            //Debug.Log(GameplayManager.GM);
+            //Debug.Log(SignatureNumber);
+            //Debug.Log(Power);
+            //Debug.Log(Signature.name + " Hit: " + collision.name);
+
+            //GameplayManager.GM.ScoreUpdate(SignatureNumber, Power);
+
             collision.GetComponent<Health>().TakeDamage(Power);
             
-            Debug.Log(Signature.name + " Hit: " + collision.name);
 
-            collision.GetComponent<Being>().setVelocity(Vector2.zero);
-            collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
+            if(collision.tag == "Enemy")
+            {
+                collision.GetComponent<EnemyAI>().SetHitstun(Power, Signature.gameObject);
+
+                //collision.GetComponent<Being>().setVelocity(Vector2.zero);
+                if (collision.GetComponent<EnemyAI>().getArmor() <= 0)
+                {
+                    collision.GetComponent<Being>().setVelocity(Vector2.zero);
+                    collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
+                    //collision.GetComponent<EnemyAI>().resetArmor();
+                    //set knockback, THEN reset the armor
+                }
+            }
+
             Crash();
         } 
         

@@ -19,22 +19,36 @@ public class EnemyAI : AI
     [SerializeField] string EnemyType;
     [SerializeField] GameObject Target;
     [SerializeField] GameObject WeaponStick;
-
+    [SerializeField] float Hitstun;
+    [SerializeField] float HitstunMultiplier;
+    [SerializeField] int[] HitstunArmor;
+    //0:Max Armor, 1: Curr Armor
     void Start()
     {
         BeingStart();
 
         CurrState = "Idle";
         WeaponStick.gameObject.SetActive(false);
+        HitstunArmor[1] = HitstunArmor[0];
     }
 
     // Update is called once per frame
     void Update()
     {
         Monitor();
+        Hitstun = Mathf.Clamp(Hitstun-= Time.deltaTime, 0, Hitstun);
 
         switch (CurrState)
         {
+            case "Hurt":
+                if (isGrounded() && Hitstun <= 0)
+                {
+                    CurrState = "Chase";
+                    resetArmor();
+                }
+                WeaponStatus(false);
+                break;
+
             case "Idle":
                 rb.velocity = new Vector2(0, rb.velocity.y);
                 stateTimer -= Time.deltaTime; 
@@ -114,16 +128,19 @@ public class EnemyAI : AI
 
     private void Monitor()
     {
-        if (LineOfSight.LockOnStatus() && CurrState != "Attack")
+        if (CurrState != "Hurt")
         {
-            CurrState = "Chase";
-            Target = LineOfSight.CurrentTarget();
-        }
+            if (LineOfSight.LockOnStatus() && CurrState != "Attack")
+            {
+                CurrState = "Chase";
+                Target = LineOfSight.CurrentTarget();
+            }
 
-        else if (!FarSight.LockOnStatus() && CurrState != "Patrol")
-        {
-            CurrState = "Idle";
-            Target = null;
+            else if (!FarSight.LockOnStatus() && CurrState != "Patrol")
+            {
+                CurrState = "Idle";
+                Target = null;
+            }
         }
     }
 
@@ -144,5 +161,45 @@ public class EnemyAI : AI
                     
         }
 
+    }
+
+    public void SetHitstun(float x, GameObject T)
+    {
+        Target = T;
+        //Now the AI knows who shot them
+
+        //Suprise Attack
+        if (CurrState == "Idle" && CurrState == "Patrol")
+            HitstunArmor[1] = 0;
+
+        //Regular Armor Deterioration
+        else
+        {
+            HitstunArmor[1]--;
+            if (x >= 5) HitstunArmor[1]--;
+            if (x >= 10) HitstunArmor[1]--;
+        }
+
+
+        if (HitstunArmor[1] <= 0)
+        {
+            CurrState = "Hurt";
+            Hitstun = x * HitstunMultiplier;
+        }
+    }
+
+    public int getArmor()
+    {
+        return HitstunArmor[1];
+    }
+
+    public void resetArmor()
+    {
+        HitstunArmor[1] = HitstunArmor[0];
+    }
+
+    public void WeaponStatus(bool b)
+    {
+        WeaponStick.gameObject.SetActive(b);
     }
 }
