@@ -9,6 +9,7 @@ TagManager:
   - Platform
   - Enemy
   - Bullet
+  - Breakable
   layers:
   - Default
   - TransparentFX

@@ -308,6 +308,7 @@ public class PlayerControl : Being
         //if KO'd
         if (isKO[2] != 0)
         {
+            inputLock = true;
             if (isKO[2] == 1)
             {
                 //pop the player up

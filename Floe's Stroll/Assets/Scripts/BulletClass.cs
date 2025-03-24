@@ -137,6 +137,12 @@ public class BulletClass : Hitbox
         }
         //Destroy(this.gameObject);
 
+        if(collision.tag == "Breakable")
+        {
+            collision.GetComponent<Breakable>().Hit(Power);
+            Crash();
+        }
+
     }
 
     private void Crash()

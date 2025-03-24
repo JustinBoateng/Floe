@@ -378,6 +378,7 @@
 "Assets/Etc_/GameplayManager.cs"
 "Assets/Scripts/Being.cs"
 "Assets/Scripts/Blade.cs"
+"Assets/Scripts/Breakable.cs"
 "Assets/Scripts/BulletClass.cs"
 "Assets/Scripts/CameraController.cs"
 "Assets/Scripts/Clock.cs"

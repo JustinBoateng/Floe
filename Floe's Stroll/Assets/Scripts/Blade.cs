@@ -19,7 +19,7 @@ public class Blade : Hitbox
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "Player" && collision.name != Signature.name)
+        if ((collision.tag == "Player" || collision.tag == "Enemy") && collision.name != Signature.name)
         {
             //Debug.Log(GameplayManager.GM);
             //Debug.Log(SignatureNumber);
