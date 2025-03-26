@@ -395,6 +395,7 @@
 "Assets/Scripts/Oil&WaterMenu/OWMenuManager.cs"
 "Assets/Scripts/Oil&WaterMenu/PlayerControllerRep.cs"
 "Assets/Scripts/Platform.cs"
+"Assets/Scripts/Swingable.cs"
 "Assets/Scripts/TitleScreen Scripts/TitleScreenManager.cs"
 "Assets/Scripts/TitleScreen Scripts/WipeManager.cs"
 "Assets/Scripts/TransitionManager.cs"

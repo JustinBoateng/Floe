@@ -17,7 +17,7 @@ public class PlayerControl : Being
 
     [SerializeField] private float DropdownTimer = 0.25f;
 
-    [SerializeField] Vector2 VelocityRef;
+    [SerializeField] public Vector2 VelocityRef;
 
     [SerializeField] private Vector2 BaseColliderOffset = new Vector2(-0.025177f, -0.1591772f);
     [SerializeField] private Vector2 BaseColliderDimensions =  new Vector2(0.8906784f, 1.777763f);
@@ -27,6 +27,13 @@ public class PlayerControl : Being
 
     [SerializeField] private Vector2 VaultForce =  new Vector2(5, 2);
     //[SerializeField] private Vector2 SlideForce =  new Vector2(3, 0);
+
+    [SerializeField] Vector2[] BulletSpeeds = new Vector2[5];
+
+    [SerializeField] Vector2[] SwingEndpoints;
+    [SerializeField] float SwingLERPValue;
+    [SerializeField] Vector2 SwingSpeed = Vector2.zero;
+
 
 
     [SerializeField] bool isCrouching = false;
@@ -64,6 +71,9 @@ public class PlayerControl : Being
 
     [SerializeField] float[] isSliding = new float[4];
     
+    [SerializeField] float[] isSwinging = new float[2];
+    //Max, Curr
+    
     [SerializeField] float[] isVaulting = new float[4];
     //0:Max  //1:curr    //2:is or isnt (initially)    //3:rate
 
@@ -79,7 +89,6 @@ public class PlayerControl : Being
 
     [SerializeField] GameObject[] ShootPosition;
     [SerializeField] BulletClass[] BulletReferences;
-    [SerializeField] Vector2[] BulletSpeeds = new Vector2[5];
     [SerializeField] int Aim;
 
     [SerializeField] int StartingAmmo;
@@ -133,7 +142,7 @@ public class PlayerControl : Being
             case "Jump":
                 isJumping[1] = isJumping[0];
                 isJumping[2] = 1;
-                Debug.Log("Applying Force");
+                //Debug.Log("Applying Force");
                 //rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Force);
                 rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
 
@@ -142,7 +151,7 @@ public class PlayerControl : Being
                 isShooting[1] = isShooting[0];
                 break;            
             case "WallJump":
-                Debug.Log("WallJumping");
+                //Debug.Log("WallJumping");
                 
                 AirDashInfo[1] = 0;
                 AirDashReplenish();
@@ -167,14 +176,18 @@ public class PlayerControl : Being
                 break;
             case "Vault":
                 //isVaulting = true;
-                Debug.Log("Vault Activated");
+                //Debug.Log("Vault Activated");
 
                 isVaulting[1] = isVaulting[0];
                 isVaulting[2] = 1; //isVaulting = true
                 cantMove();
                 break;
+            case "Swing":
+                isSwinging[1] = isSwinging[0];
+                isSwinging[2] = 1;
+                break;
             case "AirDash":
-                Debug.Log("AirDashing");
+                //Debug.Log("AirDashing");
 
                 isClimbing = false;
 
@@ -215,7 +228,8 @@ public class PlayerControl : Being
         //isVaulting[2] being set to 0 is handled in the Update function
         //this isVaulting[1] counter handles if you're in a vault state
 
-
+        if (isSwinging[2] == 1)
+            isSwinging[1] = Mathf.Clamp(isSwinging[1] - Time.deltaTime, 0, isSwinging[0]);
 
 
 
@@ -243,6 +257,8 @@ public class PlayerControl : Being
         {
             isVaulting[2] = 0;
         }
+
+        if (isSwinging[1] <= 0) isSwinging[2] = 0;
 
         if (Mathf.Abs(rb.velocity.x) < Mathf.Abs(facing[0])|| !isGrounded() || !isCrouching)
         {
@@ -274,9 +290,11 @@ public class PlayerControl : Being
 
         anim.SetFloat("isVaulting", isVaulting[1]);
         anim.SetFloat("isSliding", isSliding[1]);
+        anim.SetFloat("isSwinging", isSwinging[1]);
 
         //anim.SetFloat("isCharging", ChargeFactor[1]);
         anim.SetFloat("isKO", isKO[2]);
+
     }
     private void Movement()
     {
@@ -378,7 +396,7 @@ public class PlayerControl : Being
         //if climbing
         if (canClimb() && Mathf.Abs(ver) >= Deadzoney || isClimbing)
         {
-            Debug.Log("Climbing");
+            //Debug.Log("Climbing");
             AirDashReplenish(); //replenish airdash when climbing
             isClimbing = true;
             rb.gravityScale = 0;
@@ -388,7 +406,7 @@ public class PlayerControl : Being
         // if wall jumping
         else if (WallJumpInfo[1] > 0)
         {
-            Debug.Log("Wall Jumping");
+            //Debug.Log("Wall Jumping");
             rb.gravityScale = 0;
             //facing is adjusted in facingCalc() a few lines above
             rb.velocity = new Vector2(facing[0] * WallJumpInfo[2] * (currSpeed / 4), WallJumpInfo[3]);
@@ -398,7 +416,7 @@ public class PlayerControl : Being
         //if Vaulting
         else if (isVaulting[2] == 1) 
         {
-            Debug.Log("Vaulting");
+            //Debug.Log("Vaulting");
             rb.velocity = new Vector2(VaultForce.x * facing[0], VaultForce.y);
             GravityChange();
 
@@ -408,7 +426,7 @@ public class PlayerControl : Being
         //if sliding
         else if (isSliding[2] == 1) 
         {
-            Debug.Log("Sliding");
+            //Debug.Log("Sliding");
             rb.velocity = new Vector2(isSliding[1] * facing[0], rb.velocity.y);
             GravityChange();
 
@@ -422,11 +440,23 @@ public class PlayerControl : Being
             rb.velocity = new Vector2(rb.velocity.x + (RollDecay * -facing[0]) + (SlopeCoefficient * facing[0]), rb.velocity.y);
         }
 
+        else if (isSwinging[2] > 0)
+        {
+            rb.gravityScale = 0;
+            SwingLERPValue = Mathf.Clamp(SwingLERPValue + (ver * Time.deltaTime), 0, 1);
+            this.transform.position = Vector2.Lerp(SwingEndpoints[0], SwingEndpoints[1], SwingLERPValue);
+
+            if (isGrounded())
+            {
+                isSwinging[1] = 0;
+            }
+        }
         // if air dashing
         else if (AirDashInfo[1] > 0) 
         {
             rb.velocity = new Vector2(AirDashInfo[4] * facing[0], 0);
         }
+
 
         //if just vibing...
         else
@@ -491,7 +521,7 @@ public class PlayerControl : Being
         //Dropdown
         if (context.started && isCrouching && isOnPlatform && bc.enabled == true)
         {
-            Debug.Log("Dropping Down");
+            //Debug.Log("Dropping Down");
             StartCoroutine(  DisablePlayerCollider(DropdownTimer)  );
         }
 
@@ -500,6 +530,7 @@ public class PlayerControl : Being
         {
             isJumping[2] = 0;
             //if you let go of the button, set the isJumping boolean to false
+            //This is for high jumping / quick jumping
         }
 
         else if (context.performed) 
@@ -518,10 +549,28 @@ public class PlayerControl : Being
                 CooldownStart("WallJump");
             }
 
+            //Swing Jump
+            else if (isSwinging[2] > 0)
+            {
+                //Debug.Log("Swing Jump");
+
+                isSwinging[1] = 0;
+                isSwinging[2] = 0;
+
+                rb.velocity = SwingSpeed;
+
+                CooldownStart("Jump");
+
+                isClimbing = false;
+
+                anim.SetTrigger("Jump");
+
+            }
+
             //regular jump
             else if ((isGrounded() && !isCrouching) || isClimbing)
             {
-                Debug.Log("Jumping");
+                //Debug.Log("Jumping");
 
                 CooldownStart("Jump");
 
@@ -536,7 +585,7 @@ public class PlayerControl : Being
 
 
 
-        Debug.Log(context.phase);
+        //Debug.Log(context.phase);
     }
 
     public void onDash(InputAction.CallbackContext context)
@@ -681,14 +730,14 @@ public class PlayerControl : Being
         {
             if (isVaulting[1] > 0 || isWallRunning) //if we hit a wall while Vaulting or already WallRUnnning
             {
-                Debug.Log("WallRunning");
+                //Debug.Log("WallRunning");
                 isWallRunning = true;
                 rb.velocity = new Vector2(rb.velocity.x, Speeds[1]);
             }
             
             else
             {
-                Debug.Log("WallSliding");
+                //Debug.Log("WallSliding");
                 //AirDashReplenish();
                 rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -WallJumpInfo[4], float.MaxValue));
             }
@@ -774,5 +823,49 @@ public class PlayerControl : Being
         return PlayerNumber;
     }
 
+    public void SetSwingParameters(Vector2 v, Vector2 EPA, Vector2 EPB)
+    {
+        if (!isGrounded())
+        {
+            CooldownStart("Swing");
+            SwingSpeed = v;
+
+            SwingEndpoints[0] = EPA;
+            SwingEndpoints[1] = EPB;
+
+            float A = Vector2.Distance(EPA, this.transform.position);
+            float B = Vector2.Distance(this.transform.position, EPB);
+            float C = (A + B);
+
+            SwingLERPValue = A / (A + B);
+
+            Debug.Log("A:" + A);
+            Debug.Log("B:" + B);
+            Debug.Log("C:" + C);
+            Debug.Log("SqingLerpValue:" + SwingLERPValue);
+
+            
+            //SwingLERPValue = C - A;
+
+            if( 0.6f < SwingLERPValue  && SwingLERPValue < 0.8f)
+            {
+                SwingLERPValue = 0.7f;
+            }
+            if( 0.4f < SwingLERPValue  && SwingLERPValue < 0.6f)
+            {
+                SwingLERPValue = 0.5f;
+            }
+            if( 0.2f < SwingLERPValue  && SwingLERPValue < 0.4f)
+            {
+                SwingLERPValue = 0.3f;
+            }
+            if( 0.0f < SwingLERPValue  && SwingLERPValue < 0.2f)
+            {
+                SwingLERPValue = 0.1f;
+            }
+
+            //this.transform.position = Vector2.Lerp(EPA, EPB, SwingLERPValue);
+        }
+    }
     #endregion
 }
