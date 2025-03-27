@@ -111,4 +111,9 @@ public class Health : MonoBehaviour
             Debug.Log("Health is now " + currentHealth);
         }
     }
+
+    public void HealthRefill()
+    {
+        currentHealth = StartingHealth;
+    }
 }

@@ -82,8 +82,11 @@ public class PlayerControl : Being
     [SerializeField] float SlopeCoefficient = 0.7f;
     
     [SerializeField] float[] isHurt = new float[2]; //used for the Hurt animation
-    [SerializeField] float[] isKO = new float[3]; //used for the KO animation
-    
+    [SerializeField] float[] isKO = new float[4]; //used for the KO animation
+    //1: Max, 2: Curr, 3: isKO'd (First three for KO Animation)
+    //4: MaxReviveTimer, 5: CurrReviveTimer
+
+
     [SerializeField] float[] bulletDeterRate = { 2 };
     //determines how long bullets stay active for
 
@@ -201,8 +204,10 @@ public class PlayerControl : Being
                 cantMove();
                 break;
             case "KO'd":
+                GameplayManager.GM.CameraCont.disengageTarget();
                 bc.enabled = false;
-                isKO[1] = isKO[0];
+                isKO[1] = isKO[0]; //for physics
+                isKO[4] = isKO[3]; //for revive timer
                 isKO[2] = 1;
                 rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
                 inputLock = true;
@@ -213,6 +218,7 @@ public class PlayerControl : Being
     private void CooldownCalc()
     {
         isKO[1] = Mathf.Clamp(isKO[1] - Time.deltaTime, 0, isKO[0]);
+        isKO[4] = Mathf.Clamp(isKO[4] - Time.deltaTime, 0, isKO[4]);
 
         LockCountDown[1] = Mathf.Clamp(LockCountDown[1] - Time.deltaTime, 0, LockCountDown[0]);
         
@@ -263,6 +269,12 @@ public class PlayerControl : Being
         if (Mathf.Abs(rb.velocity.x) < Mathf.Abs(facing[0])|| !isGrounded() || !isCrouching)
         {
             isRolling = false;
+        }
+
+        if (isKO[4] <= 0 && isKO[2] > 0)
+        {
+            isKO[2] = 0;
+            Revive();
         }
 
         if (LockCountDown[1] <= 0)
@@ -866,6 +878,14 @@ public class PlayerControl : Being
 
             //this.transform.position = Vector2.Lerp(EPA, EPB, SwingLERPValue);
         }
+    }
+
+    public void Revive()
+    {
+        BeingStart(); 
+        GetComponent<Health>().HealthRefill();
+        GameplayManager.GM.PlacePlayer();
+        GameplayManager.GM.CameraCont.setTarget(this.transform);
     }
     #endregion
 }

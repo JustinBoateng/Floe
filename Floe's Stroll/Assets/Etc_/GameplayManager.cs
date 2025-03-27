@@ -13,7 +13,7 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] int currPF = 0;
     [SerializeField] PlayerInputManager PIU;
     [SerializeField] PlayerInput[] PlayerInputs;
-    [SerializeField] CameraController CameraCont;
+    [SerializeField] public CameraController CameraCont;
     [SerializeField] Transform CameraFocus;
     [SerializeField] Transform MainCharacter;
 
@@ -31,6 +31,9 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] Clock ClockRef;
     //[Max Minutes, Minutes, Seconds, Milliseconds]
 
+    [SerializeField] Checkpoints[] Checkpoints;
+    [SerializeField] int FurthestCheckpoint;
+    [SerializeField] GameObject CurrentMainPlayer;
 
 
     private void Awake()
@@ -73,6 +76,8 @@ public class GameplayManager : MonoBehaviour
         PlayerHealthBars[1].setHealth(PlayerHealth[1]);
 
         Timer[1] = Timer[0];
+
+        PlacePlayer();
     }
 
     // Update is called once per frame
@@ -167,6 +172,19 @@ public class GameplayManager : MonoBehaviour
         }
 
         ClockRef.ClockUpdate(Timer[1], Timer[2], Timer[3]);
+    }
+
+
+    public void setCheckpoint(int n)
+    {
+        FurthestCheckpoint = Mathf.Max(FurthestCheckpoint, n);
+
+    }
+
+    public void PlacePlayer()
+    {
+        CurrentMainPlayer.transform.position = Checkpoints[FurthestCheckpoint].transform.position;
+        CurrentMainPlayer.GetComponent<Health>().HealthRefill();
     }
 
 }

@@ -381,6 +381,7 @@
 "Assets/Scripts/Breakable.cs"
 "Assets/Scripts/BulletClass.cs"
 "Assets/Scripts/CameraController.cs"
+"Assets/Scripts/Checkpoints.cs"
 "Assets/Scripts/Clock.cs"
 "Assets/Scripts/Door.cs"
 "Assets/Scripts/Enemy Scripts/AI.cs"

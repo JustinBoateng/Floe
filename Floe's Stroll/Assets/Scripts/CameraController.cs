@@ -38,9 +38,11 @@ public class CameraController : MonoBehaviour
         //transform.position = Vector3.SmoothDamp(transform.position, new Vector3(currentPosX, transform.position.y, transform.position.z), ref velocity, Speed);// * Time.deltaTime);    
         //ref is the C++ equivalent to calling by reference
 
-        transform.position = new Vector3(Player.position.x + LookAhead, Player.position.y, transform.position.z);
+        if(Player)
+            transform.position = new Vector3(Player.position.x + LookAhead, Player.position.y, transform.position.z);
         BoundaryCheck();
-        LookAhead = Mathf.Lerp(LookAhead, (aheadDistance * Player.localScale.x), Time.deltaTime * CameraSpeed);
+        if(Player)
+            LookAhead = Mathf.Lerp(LookAhead, (aheadDistance * Player.localScale.x), Time.deltaTime * CameraSpeed);
         //when player.localScale.x is 1, you're facing right, and will look to the right. When localScale.x is -1, you'll face left, and will look to the left
 
     }
@@ -74,5 +76,10 @@ public class CameraController : MonoBehaviour
     public void setAhead(float a)
     {
         aheadDistance = a;
+    }
+
+    public void disengageTarget()
+    {
+        Player = null;
     }
 }
