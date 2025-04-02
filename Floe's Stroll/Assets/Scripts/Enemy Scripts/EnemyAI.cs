@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
 
 public class EnemyAI : AI
@@ -8,28 +9,34 @@ public class EnemyAI : AI
 
     //States:
     //Idle, Patrol, Atk, Hurt
-    [SerializeField] private Sight LineOfSight;
-    [SerializeField] private Sight FarSight;
-    [SerializeField] private Sight AtkRange;
+    [SerializeField] protected Sight LineOfSight;
+    [SerializeField] protected Sight FarSight;
+    [SerializeField] protected Sight AtkRange;
 
-    [SerializeField] private string CurrState = "Idle";
-    [SerializeField] float stateTimer;
-    [SerializeField] float[] Speeds;
-    [SerializeField] float[] Atk_Countdown;
-    [SerializeField] string EnemyType;
-    [SerializeField] GameObject Target;
-    [SerializeField] GameObject WeaponStick;
-    [SerializeField] float Hitstun;
-    [SerializeField] float HitstunMultiplier;
-    [SerializeField] int[] HitstunArmor;
+    [SerializeField] protected string CurrState = "Idle";
+    [SerializeField] protected float stateTimer;
+    [SerializeField] protected float[] Speeds;
+    [SerializeField] protected float[] Atk_Countdown;
+    //o: Max Cooldown, Curr Cooldown, Cooldown Rate 
+
+    [SerializeField] protected float[] Launch_Countdown;
+    //o: Max Cooldown, Curr Cooldown, Cooldown Rate 
+
+    [SerializeField] protected string EnemyType;
+    [SerializeField] protected GameObject Target;
+    //[SerializeField] protected GameObject WeaponStick;
+    [SerializeField] protected float Hitstun;
+    [SerializeField] protected float HitstunMultiplier;
+    [SerializeField] protected int[] HitstunArmor;
     //0:Max Armor, 1: Curr Armor
     void Start()
     {
         BeingStart();
 
+        this.tag = "Enemy";
         CurrState = "Idle";
-        WeaponStick.gameObject.SetActive(false);
         HitstunArmor[1] = HitstunArmor[0];
+
     }
 
     // Update is called once per frame
@@ -37,7 +44,12 @@ public class EnemyAI : AI
     {
         Monitor();
         Hitstun = Mathf.Clamp(Hitstun-= Time.deltaTime, 0, Hitstun);
+        //StateStatus();        
+    }
 
+    /*
+     * public void StateStatus()
+    {
         switch (CurrState)
         {
             case "Hurt":
@@ -51,8 +63,8 @@ public class EnemyAI : AI
 
             case "Idle":
                 rb.velocity = new Vector2(0, rb.velocity.y);
-                stateTimer -= Time.deltaTime; 
-                if(stateTimer <= 0)
+                stateTimer -= Time.deltaTime;
+                if (stateTimer <= 0)
                 {
                     facingCalc(-1);
                     CurrState = "Patrol";
@@ -63,11 +75,12 @@ public class EnemyAI : AI
             case "Patrol":
                 rb.velocity = new Vector2(Speeds[0] * facing[0], rb.velocity.y);
                 stateTimer -= Time.deltaTime;
-                if(stateTimer <= 0)
+                if (stateTimer <= 0)
                 {
                     CurrState = "Idle";
                     stateTimer = Random.Range(2f, 6f);
-;               }
+                    ;
+                }
                 break;
             case "Chase":
                 if (Target.transform.position.x < transform.position.x)
@@ -114,19 +127,19 @@ public class EnemyAI : AI
                         if (Atk_Countdown[1] <= 0)
                         {
                             AttackSwitch(false);
-                        } 
+                        }
                         break;
                 }
                 break;
         }
     }
-
+    */
     public void ChangeState(string s)
     {
         CurrState = s;
     }
 
-    private void Monitor()
+    protected void Monitor()
     {
         if (CurrState != "Hurt")
         {
@@ -144,24 +157,28 @@ public class EnemyAI : AI
         }
     }
 
-    private void AttackSwitch(bool b)
+    
+    protected void AttackSwitch(bool b)
     {
+        Atk_Countdown[1] = Atk_Countdown[0];
+        if(Launch_Countdown.Length > 0)
+            Launch_Countdown[1] = Launch_Countdown[0];
+    
         switch (b)
         {
             case true:
                 CurrState = "Attack";
-                Atk_Countdown[1] = Atk_Countdown[0];
                 break;
 
             case false:
-                Atk_Countdown[1] = Atk_Countdown[0];
                 CurrState = "Idle";
-                WeaponStick.gameObject.SetActive(false);
+                //WeaponStick.gameObject.SetActive(false);
                 break;
                     
         }
 
     }
+    
 
     public void SetHitstun(float x, GameObject T)
     {
@@ -198,8 +215,21 @@ public class EnemyAI : AI
         HitstunArmor[1] = HitstunArmor[0];
     }
 
-    public void WeaponStatus(bool b)
+    public void Track(Vector2 Tar)
+    {
+        if (Tar.x < transform.position.x) facing[0] = -1;
+        else facing[0] = 1;
+
+        if (Tar.y < transform.position.y) facing[1] = -1;
+        else facing[1] = 1;
+
+        facingCalc(1);
+    }
+
+    /*
+     * public void WeaponStatus(bool b)
     {
         WeaponStick.gameObject.SetActive(b);
     }
+    */
 }

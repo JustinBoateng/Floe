@@ -7,7 +7,7 @@ public abstract class Being : MonoBehaviour
 
     [SerializeField] protected Transform GroundCheckLocation;
     [SerializeField] protected Transform MountCheckLocation;
-    [SerializeField]protected BoxCollider2D bc;
+    [SerializeField] protected BoxCollider2D bc;
     [SerializeField] protected Rigidbody2D rb;
     [SerializeField] protected Animator anim;
 
@@ -25,8 +25,8 @@ public abstract class Being : MonoBehaviour
     [SerializeField] protected float[] gravityAdjust;
     //baserising, currrising, falling, 
 
-    [SerializeField] int[] Ammo = new int[2];
-
+    [SerializeField] int[] AmmoCount = new int[2];
+    //0: Max Amount, 1: Current Amount
     string Name;
 
     [SerializeField] public int[] facing = new int[2];
@@ -44,18 +44,18 @@ public abstract class Being : MonoBehaviour
 
     public void SetMaxAmmo(int i)
     {
-        Ammo[0] = i;
-        Ammo[1] = Ammo[0] = i;
+        AmmoCount[0] = i;
+        AmmoCount[1] = AmmoCount[0] = i;
     }
 
     public int GetAmmo()
     {
-        return Ammo[1];
+        return AmmoCount[1];
     }
 
     public void AmmoCalc(int i)
     {
-        Ammo[1] = Mathf.Clamp(Ammo[1] + i, 0, Ammo[0]);
+        AmmoCount[1] = Mathf.Clamp(AmmoCount[1] + i, 0, AmmoCount[0]);
     }
 
     protected bool isGrounded()

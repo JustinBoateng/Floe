@@ -16,6 +16,10 @@ public class BulletClass : Hitbox
 
     [SerializeField] public bool BreaksOnGround;
     [SerializeField] public bool BreaksOnWall;
+
+    [SerializeField] public string BulletType;
+    [SerializeField] public bool isCrashed;
+    [SerializeField] public Transform BasePosition;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +29,7 @@ public class BulletClass : Hitbox
     // Update is called once per frame
     void Update()
     {
+        if(!isCrashed)
         rb.velocity = new Vector2(xSpeed * facing[0], ySpeed * facing[1]);
         //Note; the ySpeed going in must always be positive, since facing[1] can be negative in the air.
 
@@ -43,29 +48,45 @@ public class BulletClass : Hitbox
         facing[1] = y;
     }
     
+    //Used for Basic Bullets
     public void setDirection(int i)
     {
         switch (i)
         {
 
+            //To the right
             case 1:
                 xSpeed *= 1;
                 ySpeed *= 0;
                 break;
+
+            //To the left
             case 2:
                 xSpeed *= -1;
                 ySpeed *= 0;
-                break;            
+                break;   
+                
+            //Upwards
             case 3:
                 xSpeed *= 0;
                 ySpeed *= 1;
                 break;            
+
+            //Downwards
             case 4:
                 xSpeed *= 0;
                 ySpeed *= 1;
                 break;            
 
         }
+    }
+
+    //Used for Return Bullets
+    public void setDirection(float x, float y)
+    {
+        xSpeed = x; ySpeed = y;
+        facing[0] = 1;
+        facing[1] = 1;
     }
 
     public void setDeterioration(float rate)
@@ -75,6 +96,11 @@ public class BulletClass : Hitbox
         LifeExpectancy[2] = rate;
     }
 
+    public void setSignature(Being B)
+    {
+        Signature = B;
+    }
+    
     public void setSignature(Being B, int i)
     {
         Signature = B;
@@ -82,7 +108,8 @@ public class BulletClass : Hitbox
     }
     private void BulletDeterioration()
     {
-        LifeExpectancy[1] += LifeExpectancy[2];
+        //LifeExpectancy[1] += LifeExpectancy[2];
+        LifeExpectancy[1] += Time.deltaTime; ;
         if (LifeExpectancy[1] >= LifeExpectancy[0])
         {
             Signature.AmmoCalc(1);
@@ -92,7 +119,9 @@ public class BulletClass : Hitbox
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if((collision.tag == "Player" || collision.tag == "Enemy") && collision.name != Signature.name)
+        //Debug.Log(collision.name);
+
+        if ((collision.tag == "Player" || collision.tag == "Enemy") && collision.name != Signature.name)
         {
             //Debug.Log(GameplayManager.GM);
             //Debug.Log(SignatureNumber);
@@ -102,9 +131,9 @@ public class BulletClass : Hitbox
             //GameplayManager.GM.ScoreUpdate(SignatureNumber, Power);
 
             collision.GetComponent<Health>().TakeDamage(Power);
-            
 
-            if(collision.tag == "Enemy")
+
+            if (collision.tag == "Enemy")
             {
                 collision.GetComponent<EnemyAI>().SetHitstun(Power, Signature.gameObject);
 
@@ -116,40 +145,73 @@ public class BulletClass : Hitbox
                     //collision.GetComponent<EnemyAI>().resetArmor();
                     //set knockback, THEN reset the armor
                 }
+                //Debug.Log("Enemy Destroyed this");
+
             }
 
+            //Debug.Log("Player did this if Enemy Didn't");
+
             Crash();
-        } 
-        
-        if((collision.tag == "Ground"  && BreaksOnGround) || (collision.tag == "Wall" && BreaksOnWall))
+        }
+
+        if ((collision.tag == "Ground" && BreaksOnGround) || (collision.tag == "Wall" && BreaksOnWall) && ySpeed != 0)
         {
             //Debug.Log(GameplayManager.GM);
             //Debug.Log(SignatureNumber);
             //Debug.Log(Power);            
+            //Debug.Log("Ground Destroyed this");
             Crash();
         }
 
-        if(collision.tag == "Bullet")
+        if (collision.tag == "Bullet")
         {
-            if(collision.GetComponent<BulletClass>().Signature != Signature)
+
+            //Debug.Log("Bullet Destroyed this");
+            if (collision.GetComponent<BulletClass>().Signature != Signature)
+            {
+                //Debug.Log("Because Signatures don't match");
                 if (collision.GetComponent<BulletClass>().Power >= Power)
                     Crash();
+            }
+
         }
         //Destroy(this.gameObject);
 
-        if(collision.tag == "Breakable")
+        if (collision.tag == "Breakable")
         {
             collision.GetComponent<Breakable>().Hit(Power);
+            //Debug.Log("Breakable Destroyed this");
             Crash();
         }
 
+        //else Debug.Log("Yeah, it aint in here dawg.");
     }
 
-    private void Crash()
+    public void Crash()
     {
+
         //play Animation coroutine
-        Signature.AmmoCalc(1);
-        Destroy(this.gameObject);
+
+        Debug.Log("Bullets Crashed");
+
+        switch (BulletType)
+        {
+            case "Basic":
+                Signature.AmmoCalc(1);
+                Destroy(this.gameObject);
+                break;
+
+            case "Return":
+                isCrashed = true;
+                this.gameObject.SetActive(false);
+                this.transform.position = BasePosition.transform.position;
+                LifeExpectancy[1] = 0;
+                break;
+        }
     }
 
+    public void setBasePosition(Transform bP)
+    {
+        BasePosition = bP;
+    }
 }

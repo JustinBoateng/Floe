@@ -675,7 +675,7 @@ public class PlayerControl : Being
 
                 b.GetComponent<BulletClass>().setDirection(Aim);
 
-                b.GetComponent<BulletClass>().setDeterioration(bulletDeterRate[0]);
+                //b.GetComponent<BulletClass>().setDeterioration(bulletDeterRate[0]);
                 b.GetComponent<BulletClass>().setSignature(this, PlayerNumber);
 
                 ChargeFactor[1] = 0;

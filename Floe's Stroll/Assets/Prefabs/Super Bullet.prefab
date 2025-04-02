@@ -161,16 +161,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7dce3fab12c17341b4bf31961a2b2f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xSpeed: 8
-  ySpeed: 8
-  facing: 0000000000000000
-  LifeExpectancy:
-  - 0
-  - 0
-  - 0
   Signature: {fileID: 0}
   SignatureNumber: 0
   Power: 5
   Knockback: {x: 4, y: 4}
+  xSpeed: 8
+  ySpeed: 8
+  facing: 0000000000000000
+  LifeExpectancy:
+  - 2
+  - 0
+  - 0.25
   BreaksOnGround: 0
   BreaksOnWall: 1
+  BulletType: Basic
+  BasePosition: {fileID: 0}

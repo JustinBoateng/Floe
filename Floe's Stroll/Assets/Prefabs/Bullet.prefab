@@ -169,8 +169,10 @@ MonoBehaviour:
   ySpeed: 5
   facing: 0000000000000000
   LifeExpectancy:
+  - 2
   - 0
-  - 0
-  - 0
+  - 0.25
   BreaksOnGround: 1
   BreaksOnWall: 1
+  BulletType: Basic
+  BasePosition: {fileID: 0}
