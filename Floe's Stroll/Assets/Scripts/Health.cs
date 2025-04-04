@@ -102,6 +102,10 @@ public class Health : MonoBehaviour
     }
 
 
+    public void Heal(int h)
+    {
+        currentHealth = Mathf.Clamp(currentHealth + h, 0, StartingHealth);
+    }
 
     public void onDmgTest(InputAction.CallbackContext context)
     {

@@ -163,8 +163,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Signature: {fileID: 0}
   SignatureNumber: 0
-  Power: 2
-  Knockback: {x: 4, y: 4}
+  Power: 4
+  Knockback: {x: 6, y: 4}
   xSpeed: 8
   ySpeed: 8
   facing: 0000000000000000
@@ -175,4 +175,5 @@ MonoBehaviour:
   BreaksOnGround: 0
   BreaksOnWall: 1
   BulletType: Return
+  isCrashed: 0
   BasePosition: {fileID: 0}
