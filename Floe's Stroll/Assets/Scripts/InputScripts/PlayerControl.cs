@@ -101,6 +101,8 @@ public class PlayerControl : Being
     [SerializeField] float[] ChargeFactor;
     //[Max, Curr, isCharging]
 
+    [SerializeField] int[] Coins = new int[2];
+    //Copper, Nickel
 
 
     // Start is called before the first frame update
@@ -125,6 +127,8 @@ public class PlayerControl : Being
 
         AimMovement();
 
+        Debug.Log("Grounded: " + isGrounded());
+
     }
 
     //Update for physics
@@ -143,12 +147,14 @@ public class PlayerControl : Being
         switch (z)
         {
             case "Jump":
+                anim.SetTrigger("Jump");
+
                 isJumping[1] = isJumping[0];
                 isJumping[2] = 1;
-                //Debug.Log("Applying Force");
-                //rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Force);
                 rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
-
+                
+                isClimbing = false;
+                
                 break;
             case "Shoot":
                 isShooting[1] = isShooting[0];
@@ -178,6 +184,7 @@ public class PlayerControl : Being
                 cantMove();
                 break;
             case "Vault":
+                ResetStates("Vault");
                 //isVaulting = true;
                 //Debug.Log("Vault Activated");
 
@@ -186,12 +193,13 @@ public class PlayerControl : Being
                 cantMove();
                 break;
             case "Swing":
+                ResetStates("Swing");
                 isSwinging[1] = isSwinging[0];
                 isSwinging[2] = 1;
                 break;
             case "AirDash":
                 //Debug.Log("AirDashing");
-
+                ResetStates("AirDash");
                 isClimbing = false;
 
                 AirDashInfo[3]--;
@@ -237,6 +245,9 @@ public class PlayerControl : Being
         if (isSwinging[2] == 1)
             isSwinging[1] = Mathf.Clamp(isSwinging[1] - Time.deltaTime, 0, isSwinging[0]);
 
+        if (isGrounded())
+            isSwinging[1] = 0;
+        
 
 
         AirDashInfo[1] = Mathf.Clamp(AirDashInfo[1] - Time.deltaTime, 0, AirDashInfo[0]);
@@ -458,10 +469,6 @@ public class PlayerControl : Being
             SwingLERPValue = Mathf.Clamp(SwingLERPValue + (ver * Time.deltaTime), 0, 1);
             this.transform.position = Vector2.Lerp(SwingEndpoints[0], SwingEndpoints[1], SwingLERPValue);
 
-            if (isGrounded())
-            {
-                isSwinging[1] = 0;
-            }
         }
         // if air dashing
         else if (AirDashInfo[1] > 0) 
@@ -582,13 +589,7 @@ public class PlayerControl : Being
             //regular jump
             else if ((isGrounded() && !isCrouching) || isClimbing)
             {
-                //Debug.Log("Jumping");
-
                 CooldownStart("Jump");
-
-                isClimbing = false;
-                
-                anim.SetTrigger("Jump");
             }
  
             
@@ -851,10 +852,10 @@ public class PlayerControl : Being
 
             SwingLERPValue = A / (A + B);
 
-            Debug.Log("A:" + A);
-            Debug.Log("B:" + B);
-            Debug.Log("C:" + C);
-            Debug.Log("SqingLerpValue:" + SwingLERPValue);
+            //Debug.Log("A:" + A);
+            //Debug.Log("B:" + B);
+            //Debug.Log("C:" + C);
+            //Debug.Log("SqingLerpValue:" + SwingLERPValue);
 
             
             //SwingLERPValue = C - A;
@@ -880,10 +881,66 @@ public class PlayerControl : Being
         }
     }
 
+    public void ResetStates(string ignore = "")
+    {
+        if( ignore != "Swing" )
+            isSwinging[1] = 0;
+        if (ignore != "Vault")
+            isVaulting[1] = 0;
+        if (ignore != "AirDash")
+            AirDashInfo[1] = 0;
+        if (ignore != "Lock")
+            LockCountDown[1] = 0;
+        if (ignore != "WallJump")
+            WallJumpInfo[1] = 0;
+    }
+    public void Collect(string s)
+    {
+
+        switch (s)
+        {
+
+            case "Copper":
+                //play Collected Animation for Copper
+                Coins[0]++;
+                break;
+
+            case "Nickel":
+                //play Collected Animation for Nickel
+                Coins[1]++;
+                break;
+
+            case "Bubble":
+                //play Collected Animation for Bubble
+                ResetStates();
+                AirDashReplenish();
+                //rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
+                rb.velocity = Vector2.zero;
+                CooldownStart("Jump");
+                break;
+
+            case "WaterSmall":
+                //Play Healing Animation
+                GetComponent<Health>().Heal(3);
+    
+            break;
+
+            case "WaterLarge":
+                //Play Healing Animation
+                GetComponent<Health>().Heal(7);
+    
+            break;
+        }
+
+    }
+
+
+
     public void Revive()
     {
         BeingStart(); 
         GetComponent<Health>().HealthRefill();
+        Coins[0] = 0;  Coins[1] = 0;
         GameplayManager.GM.PlacePlayer();
         GameplayManager.GM.CameraCont.setTarget(this.transform);
     }

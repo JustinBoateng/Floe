@@ -149,6 +149,12 @@ public class BulletClass : Hitbox
 
             }
 
+            if(collision.tag == "Player")
+            {
+                collision.GetComponent<Being>().setVelocity(Vector2.zero);
+                collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
+            }
+
             //Debug.Log("Player did this if Enemy Didn't");
 
             Crash();

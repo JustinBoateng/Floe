@@ -84,6 +84,8 @@ public class GameplayManager : MonoBehaviour
     void Update()
     {
         //Debug.Log(Input.GetJoystickNames());
+        if (GM == null) Awake();
+        Debug.Log(GM.name);
         TimeCalc();
     }
 
