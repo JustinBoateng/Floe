@@ -16,6 +16,11 @@ public class MovingTerrain : MonoBehaviour
     [SerializeField] int direction = 1; //1 or -1
     [SerializeField] float Speed = 1; //1 or -1
     // Start is called before the first frame update
+
+    [SerializeField] Transform Platform;
+
+    //[SerializeField] BoxCollider2D bc;
+
     void Start()
     {
         PauseCountdown[1] = PauseCountdown[0];
@@ -34,7 +39,7 @@ public class MovingTerrain : MonoBehaviour
                 PauseCountdown[2] = 1;
             }
 
-            this.transform.position = Vector2.Lerp(Endpoints[0].position, Endpoints[1].position, LerpValue);
+            Platform.transform.position = Vector2.Lerp(Endpoints[0].position, Endpoints[1].position, LerpValue);
         }
         if (PauseCountdown[2] == 1) {
             Halt();
@@ -50,4 +55,32 @@ public class MovingTerrain : MonoBehaviour
             PauseCountdown[2] = 0;
         }
     }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        //if (collision.GetComponent<Being>())
+        if (collision.tag == "Player")
+        {
+            Debug.Log("Entered Platform");
+            collision.transform.SetParent(this.transform);
+        }
+    }
+
+    public void OnTriggerStay2D(Collider2D collision)
+    {
+        
+    }
+
+    public void OnTriggerExit2D(Collider2D collision)
+    {
+        //if (collision.GetComponent<Being>())
+        if (collision.tag == "Player")
+        {
+            Debug.Log("Entered Platform");
+            collision.transform.SetParent(null);
+        }
+    }
+
+    //even if the platform already has colliders, as long as one of them is a trigger, the above two functions should work.
+    //just make sure this script is attached to an object with that very same collider
 }

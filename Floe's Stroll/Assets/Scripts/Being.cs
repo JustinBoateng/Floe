@@ -14,13 +14,14 @@ public abstract class Being : MonoBehaviour
     [SerializeField] protected LayerMask platformLayer;
     [SerializeField] protected LayerMask groundLayer;
     [SerializeField] protected LayerMask wallLayer;
-    [SerializeField] protected LayerMask mountLayer;
+    [SerializeField] protected LayerMask ClimbLayer;
     [SerializeField] protected LayerMask beingLayer;
     [SerializeField] protected LayerMask PlayerLayer;
 
     [SerializeField] protected bool isOnPlatform;
     [SerializeField] protected bool isOnBeing;
     [SerializeField] protected bool isOnPlayer;
+    [SerializeField] protected GameObject currentMount;
 
     [SerializeField] protected float[] gravityAdjust;
     //baserising, currrising, falling, 
@@ -58,7 +59,7 @@ public abstract class Being : MonoBehaviour
         AmmoCount[1] = Mathf.Clamp(AmmoCount[1] + i, 0, AmmoCount[0]);
     }
 
-    protected bool isGrounded()
+    public bool isGrounded()
     {
         RaycastHit2D ray3 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, groundLayer);
         RaycastHit2D ray4 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, platformLayer);
@@ -115,4 +116,23 @@ public abstract class Being : MonoBehaviour
         facing[0] = 1;
     }
     //use this just in case a class that derives from this one has its own Start Function and you don't want these steps to be overwritten
+
+    public void Mount(GameObject b)
+    {
+        currentMount = b;
+        if (b == false)
+        {
+            rb.gravityScale = 1;
+        }
+
+        else
+        {
+            rb.gravityScale = 0;
+        }
+    }
+
+    public GameObject MountStatus()
+    {
+        return currentMount;
+    }
 }

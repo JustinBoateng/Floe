@@ -104,6 +104,7 @@ public class PlayerControl : Being
     [SerializeField] int[] Coins = new int[2];
     //Copper, Nickel
 
+    [SerializeField] Transform TerrainObject;
 
     // Start is called before the first frame update
     void Start()
@@ -149,8 +150,12 @@ public class PlayerControl : Being
             case "Jump":
                 anim.SetTrigger("Jump");
 
+                AirDashReplenish();
+
                 isJumping[1] = isJumping[0];
                 isJumping[2] = 1;
+
+                rb.velocity = Vector2.zero;
                 rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
                 
                 isClimbing = false;
@@ -321,6 +326,8 @@ public class PlayerControl : Being
     }
     private void Movement()
     {
+        Debug.Log(rb.velocity.y);
+
         //hor input cannot change if you're crouching
         if (isCrouching) hor = 0;
         
@@ -586,6 +593,14 @@ public class PlayerControl : Being
 
             }
 
+
+            //Mount Jump
+            else if (MountStatus())
+            {
+                Mount(null);
+                CooldownStart("Jump");
+            }
+
             //regular jump
             else if ((isGrounded() && !isCrouching) || isClimbing)
             {
@@ -594,7 +609,6 @@ public class PlayerControl : Being
  
             
         }
-
 
 
 
@@ -664,7 +678,12 @@ public class PlayerControl : Being
                 CooldownStart("Shoot");
 
 
-                GameObject b = Instantiate(BulletReferences[currentBullet].gameObject, ShootPosition[Aim].transform.position, this.transform.rotation);
+                GameObject b = Instantiate(
+                    BulletReferences[currentBullet].gameObject, 
+                    new Vector2(ShootPosition[Aim].transform.position.x, ShootPosition[Aim].transform.position.y),// + BulletReferences[currentBullet].offset, 
+                    this.transform.rotation);
+                //Adjusted to make the larger bullets spawn further away
+
                 b.GetComponent<BulletClass>().setfacing(facing[0], facing[1]);
 
                 int movSpeed = 0;
@@ -702,7 +721,7 @@ public class PlayerControl : Being
     private bool canClimb()
     {   //Handles if you can climb or if you are no longer climbing. 
         //"If you are climbing" is handled in Movement()
-        RaycastHit2D ClimbRay = Physics2D.BoxCast(bc.bounds.center, bc.bounds.size, 0, Vector2.down, 0.1f, mountLayer);
+        RaycastHit2D ClimbRay = Physics2D.BoxCast(bc.bounds.center, bc.bounds.size, 0, Vector2.down, 0.1f, ClimbLayer);
         bool c = ClimbRay.collider != null;
 
         if (c == false) isClimbing = false;
@@ -836,7 +855,7 @@ public class PlayerControl : Being
         return PlayerNumber;
     }
 
-    public void SetSwingParameters(Vector2 v, Vector2 EPA, Vector2 EPB)
+    public void SetSwingParameters(Vector2 v, Vector2 EPA, Vector2 EPB)//, Transform t)
     {
         if (!isGrounded())
         {
@@ -851,14 +870,6 @@ public class PlayerControl : Being
             float C = (A + B);
 
             SwingLERPValue = A / (A + B);
-
-            //Debug.Log("A:" + A);
-            //Debug.Log("B:" + B);
-            //Debug.Log("C:" + C);
-            //Debug.Log("SqingLerpValue:" + SwingLERPValue);
-
-            
-            //SwingLERPValue = C - A;
 
             if( 0.6f < SwingLERPValue  && SwingLERPValue < 0.8f)
             {
@@ -877,10 +888,16 @@ public class PlayerControl : Being
                 SwingLERPValue = 0.1f;
             }
 
-            //this.transform.position = Vector2.Lerp(EPA, EPB, SwingLERPValue);
+            //TerrainObject = t;
+
         }
     }
 
+    public void MaintainSwingParameters(Vector2 EPA, Vector2 EPB)
+    {
+        SwingEndpoints[0] = EPA;
+        SwingEndpoints[1] = EPB;
+    }
     public void ResetStates(string ignore = "")
     {
         if( ignore != "Swing" )
@@ -915,7 +932,7 @@ public class PlayerControl : Being
                 ResetStates();
                 AirDashReplenish();
                 //rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
-                rb.velocity = Vector2.zero;
+                //rb.velocity = Vector2.zero;
                 CooldownStart("Jump");
                 break;
 

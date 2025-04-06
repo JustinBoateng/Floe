@@ -167,6 +167,10 @@ MonoBehaviour:
   Knockback: {x: 6, y: 4}
   xSpeed: 8
   ySpeed: 8
+  xoffset: 1
+  yoffset: 1
+  xconstraint: 1
+  yconstraint: 1
   facing: 0000000000000000
   LifeExpectancy:
   - 2
@@ -174,6 +178,12 @@ MonoBehaviour:
   - 0.25
   BreaksOnGround: 0
   BreaksOnWall: 1
+  isRidable: 0
+  RideBox: {fileID: 0}
+  WallBox: {fileID: 0}
+  MountSpot: {fileID: 0}
+  Rider: {fileID: 0}
   BulletType: Return
   isCrashed: 0
   BasePosition: {fileID: 0}
+  offset: {x: 0, y: 0}
