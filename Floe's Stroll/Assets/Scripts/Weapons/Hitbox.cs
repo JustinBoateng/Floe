@@ -52,4 +52,9 @@ public class Hitbox : MonoBehaviour
 
 
     }
+
+    public void setSignature(Being B)
+    {
+        Signature = B;
+    }
 }

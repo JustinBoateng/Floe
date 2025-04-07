@@ -183,12 +183,14 @@ public class EnemyAI : AI
     public void SetHitstun(float x, GameObject T)
     {
         Target = T;
+        CurrState = "Chase";
         //Now the AI knows who shot them
 
         //Suprise Attack
         if (CurrState == "Idle" && CurrState == "Patrol")
+        {
             HitstunArmor[1] = 0;
-
+        }
         //Regular Armor Deterioration
         else
         {

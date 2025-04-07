@@ -33,8 +33,11 @@ public class FootSoldierAI : EnemyAI
         CurrState = "Idle";
         HitstunArmor[1] = HitstunArmor[0];
 
-        WeaponStick.gameObject.SetActive(false);
-
+        if (WeaponStick)
+        {
+            WeaponStick.GetComponent<Hitbox>().setSignature(this);
+            WeaponStick.gameObject.SetActive(false);
+        }
     }
 
 

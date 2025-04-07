@@ -12,7 +12,7 @@ public class Health : MonoBehaviour
     //instead of doing an entire get and set function, we can just do this.
 
     [SerializeField] private Animator anim;
-    [SerializeField] private bool dead;
+    [SerializeField] private bool Downed;
 
     [SerializeField] float[] DamageRecoil = new float[2]; //0: x-vector, 1: y-vector
 
@@ -29,7 +29,7 @@ public class Health : MonoBehaviour
     private void Awake()
     {
         currentHealth = StartingHealth;
-        dead = false;
+        Downed = false;
     }
     private void Start()
     {
@@ -90,8 +90,10 @@ public class Health : MonoBehaviour
             {
                 if(GetComponent<PlayerControl>())
                     GetComponent<PlayerControl>().CooldownStart("KO'd");
+                
                 if (GetComponent<EnemyAI>())
                 {
+                    Downed = true;
                     Debug.Log("Enemy Defeated");
                     Destroy(this.gameObject);
                 }
@@ -119,5 +121,10 @@ public class Health : MonoBehaviour
     public void HealthRefill()
     {
         currentHealth = StartingHealth;
+    }
+
+    public bool isDown()
+    {
+        return Downed;
     }
 }

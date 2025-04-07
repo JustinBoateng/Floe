@@ -101,7 +101,7 @@ public class PlayerControl : Being
     [SerializeField] float[] ChargeFactor;
     //[Max, Curr, isCharging]
 
-    [SerializeField] int[] Coins = new int[2];
+    [SerializeField] public int[] Coins = new int[2];
     //Copper, Nickel
 
     [SerializeField] Transform TerrainObject;
@@ -128,7 +128,7 @@ public class PlayerControl : Being
 
         AimMovement();
 
-        Debug.Log("Grounded: " + isGrounded());
+        //Debug.Log("Grounded: " + isGrounded());
 
     }
 
@@ -326,7 +326,7 @@ public class PlayerControl : Being
     }
     private void Movement()
     {
-        Debug.Log(rb.velocity.y);
+        //Debug.Log(rb.velocity.y);
 
         //hor input cannot change if you're crouching
         if (isCrouching) hor = 0;
@@ -662,11 +662,18 @@ public class PlayerControl : Being
         if(context.started && isHurt[1] == 0) 
         {
             ChargeFactor[2] = 1;
+            ChargeFactor[1] = 0;
             //Make sure ChargeFactor[0] is the same as the amount of different bullets you can charge to
 
             //play Charge animation
         }
-        
+
+        /*
+        if (context.performed && isHurt[1] == 0)
+        {
+            ChargeFactor[1] = Mathf.Clamp(ChargeFactor[1] + Time.deltaTime, 0, ChargeFactor[0]);
+        }
+        */
         if (context.canceled && isHurt[1] == 0) //We can shoot because we are not hurt
         {
             if (GetAmmo() > 0)

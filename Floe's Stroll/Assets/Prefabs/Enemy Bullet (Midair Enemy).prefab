@@ -165,8 +165,8 @@ MonoBehaviour:
   SignatureNumber: 0
   Power: 4
   Knockback: {x: 6, y: 4}
-  xSpeed: 8
-  ySpeed: 8
+  xSpeed: 5
+  ySpeed: 5
   xoffset: 1
   yoffset: 1
   xconstraint: 1

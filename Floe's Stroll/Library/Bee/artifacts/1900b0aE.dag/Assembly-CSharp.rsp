@@ -378,6 +378,7 @@
 "Assets/Etc_/GameplayManager.cs"
 "Assets/Scripts/Being.cs"
 "Assets/Scripts/Collectable.cs"
+"Assets/Scripts/CollectionTracker.cs"
 "Assets/Scripts/Enemy Scripts/AI.cs"
 "Assets/Scripts/Enemy Scripts/EnemyAI.cs"
 "Assets/Scripts/Enemy Scripts/FootSoldierAI.cs"

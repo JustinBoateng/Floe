@@ -29,7 +29,10 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField] float[] Timer = new float[4];
     [SerializeField] Clock ClockRef;
+    [SerializeField] CollectionTracker CollectRef;
     //[Max Minutes, Minutes, Seconds, Milliseconds]
+
+
 
     [SerializeField] Checkpoints[] Checkpoints;
     [SerializeField] int FurthestCheckpoint;
@@ -87,6 +90,8 @@ public class GameplayManager : MonoBehaviour
         if (GM == null) Awake();
         Debug.Log(GM.name);
         TimeCalc();
+        if(numPlayers == 1)
+            SinglePlayerScoreCalc();
     }
 
     public void NextPlayerSpawn()
@@ -176,7 +181,21 @@ public class GameplayManager : MonoBehaviour
         ClockRef.ClockUpdate(Timer[1], Timer[2], Timer[3]);
     }
 
+    private void SinglePlayerScoreCalc()
+    {
+        int[] c = CurrentMainPlayer.GetComponent<PlayerControl>().Coins;
+        //Copper, Nickels
 
+        CollectRef.ScoreUpdate(c[0], c[1], c[0] + c[1] * 5);
+    }
+
+    private void CoinCalc()
+    {
+        if (GameOn)
+        {
+
+        }
+    }
     public void setCheckpoint(int n)
     {
         FurthestCheckpoint = Mathf.Max(FurthestCheckpoint, n);

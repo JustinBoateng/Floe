@@ -168,31 +168,32 @@ public class BulletClass : Hitbox
 
             collision.GetComponent<Health>().TakeDamage(Power);
 
-
-            if (collision.tag == "Enemy")
+            if (!collision.GetComponent<Health>().isDown())
             {
-                collision.GetComponent<EnemyAI>().SetHitstun(Power, Signature.gameObject);
+                if (collision.tag == "Enemy")
+                {
+                    collision.GetComponent<EnemyAI>().SetHitstun(Power, Signature.gameObject);
 
-                //collision.GetComponent<Being>().setVelocity(Vector2.zero);
-                if (collision.GetComponent<EnemyAI>().getArmor() <= 0)
+                    //collision.GetComponent<Being>().setVelocity(Vector2.zero);
+                    if (collision.GetComponent<EnemyAI>().getArmor() <= 0)
+                    {
+                        collision.GetComponent<Being>().setVelocity(Vector2.zero);
+                        collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
+                        //collision.GetComponent<EnemyAI>().resetArmor();
+                        //set knockback, THEN reset the armor
+                    }
+                    //Debug.Log("Enemy Destroyed this");
+
+                }
+
+                if (collision.tag == "Player")
                 {
                     collision.GetComponent<Being>().setVelocity(Vector2.zero);
                     collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
-                    //collision.GetComponent<EnemyAI>().resetArmor();
-                    //set knockback, THEN reset the armor
                 }
-                //Debug.Log("Enemy Destroyed this");
 
+                //Debug.Log("Player did this if Enemy Didn't");
             }
-
-            if(collision.tag == "Player")
-            {
-                collision.GetComponent<Being>().setVelocity(Vector2.zero);
-                collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
-            }
-
-            //Debug.Log("Player did this if Enemy Didn't");
-
             Crash();
         }
 
@@ -296,7 +297,10 @@ public class BulletClass : Hitbox
             case "Return":
                 isCrashed = true;
                 this.gameObject.SetActive(false);
-                this.transform.position = BasePosition.transform.position;
+
+                if(BasePosition)
+                    this.transform.position = BasePosition.transform.position;
+
                 LifeExpectancy[1] = 0;
                 break;
         }
