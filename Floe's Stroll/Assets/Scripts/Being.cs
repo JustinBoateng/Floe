@@ -82,17 +82,18 @@ public abstract class Being : MonoBehaviour
 
     protected void GravityChange()
     {
+        //this occurs if you're in the air
         if (!isGrounded())
         {
             if (rb.velocity.y > 0)
             {
                 gravityAdjust[1] = Mathf.Clamp(gravityAdjust[1] + Time.deltaTime, gravityAdjust[1], gravityAdjust[2]);
-                rb.gravityScale = gravityAdjust[1];
+                rb.gravityScale = gravityAdjust[1]; //current gravity is gA[1], which rises up to gA[2] (which is being used for convenience's sake)
             }
             else if (rb.velocity.y <= 0)
             {
-                gravityAdjust[1] = gravityAdjust[0];
-                rb.gravityScale = gravityAdjust[2];
+                gravityAdjust[1] = gravityAdjust[0]; // set gA[1] back to normal (gA[0])
+                rb.gravityScale = gravityAdjust[2]; //current gravity is falling gravity
             }
         }
 

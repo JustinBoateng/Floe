@@ -10,6 +10,8 @@ public class PlayerControl : Being
     [SerializeField] int PlayerNumber;
     [SerializeField] float hor;
     [SerializeField] float ver;
+    [SerializeField] float inputx;
+    [SerializeField] float inputy;
     [SerializeField] float Deadzonex = 0.4f;
     [SerializeField] float Deadzoney = 0.4f;
 
@@ -58,7 +60,22 @@ public class PlayerControl : Being
 
 
     [SerializeField] float[] isJumping = new float[3];
-    ////0: Max, 1: Curr, 2: isJumping, 3: JumpForce    // 4: minimum jump cutoff point. the higher this value, the higher the short jump    // 5: Jumping Drag (the rate of decreacing the upwards velocity as you SHORT jump upwards.) 
+    //  0: Max that [1] can be,
+    //  1: Current value of jump counter,
+    //  2: isJumping boolean (is the player actually pressing the jump button), 
+    //0, 1., have more to do with the short jump physics
+
+    [SerializeField] float[] jumpNuance = new float[3];
+    // 0 : JumpForce
+    // 1 : minimum jump cutoff point. the higher this value, the higher the short jump    
+    // 2 : Jumping Drag (the rate of decreasing the upwards velocity as you SHORT jump upwards.) 
+    // 2 might not be necessary
+
+    //if isJumping[1] is lower than jumpNuance[1], then the short jump ends
+    //isJumping[0] determines how high isJumping[1] can be
+    //keep in mind, the higher isJumping[1] can be, the faster the jump deceleration
+    //since it's decreasing y velocity per frame via what isJumping[1] currently is.
+    //isJumpingp[0] and jumpNuance[1] tends to be in charge of Short Jump physics
 
     [SerializeField] float[] isShooting = new float[2]; //used for the shooting animation
     //0: Max, 1: curr
@@ -156,8 +173,12 @@ public class PlayerControl : Being
                 isJumping[2] = 1;
 
                 rb.velocity = Vector2.zero;
-                rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
-                
+                rb.AddForce(new Vector2(rb.velocity.x, jumpNuance[0]), ForceMode2D.Impulse);
+                //rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
+                //AddForce is used here to set up physics for any jumping.
+                //It's needed to get Floe off the ground.
+                //Maintaining that velocity is done in the Update Function
+
                 isClimbing = false;
                 
                 break;
@@ -222,7 +243,7 @@ public class PlayerControl : Being
                 isKO[1] = isKO[0]; //for physics
                 isKO[4] = isKO[3]; //for revive timer
                 isKO[2] = 1;
-                rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
+                rb.AddForce(new Vector2(rb.velocity.x, jumpNuance[0]), ForceMode2D.Impulse);
                 inputLock = true;
                 GameplayManager.GM.PlayerDown(PlayerNumber);
                 break;
@@ -230,63 +251,46 @@ public class PlayerControl : Being
     }
     private void CooldownCalc()
     {
-        isKO[1] = Mathf.Clamp(isKO[1] - Time.deltaTime, 0, isKO[0]);
-        isKO[4] = Mathf.Clamp(isKO[4] - Time.deltaTime, 0, isKO[4]);
+        isKO[1]          = Mathf.Clamp(isKO[1]          - Time.deltaTime, 0, isKO[0]); //for checing if you're ko'd
+        isKO[4]          = Mathf.Clamp(isKO[4]          - Time.deltaTime, 0, isKO[4]); //for revive timer
+        LockCountDown[1] = Mathf.Clamp(LockCountDown[1] - Time.deltaTime, 0, LockCountDown[0]);        
 
-        LockCountDown[1] = Mathf.Clamp(LockCountDown[1] - Time.deltaTime, 0, LockCountDown[0]);
-        
-        isJumping[1] = Mathf.Clamp(isJumping[1] - Time.deltaTime, 0, isJumping[0]);
-             
+        isJumping[1]     = Mathf.Clamp(isJumping[1]     - Time.deltaTime, 0, isJumping[0]);
+        WallJumpInfo[1]  = Mathf.Clamp(WallJumpInfo[1]  - Time.deltaTime, 0, WallJumpInfo[0]);
+        isVaulting[1]    = Mathf.Clamp(isVaulting[1]    - Time.deltaTime, 0, isVaulting[0]);
+
+        isSwinging[1]    = Mathf.Clamp(isSwinging[1]    - Time.deltaTime, 0, isSwinging[0]);
+        isSliding[1]     = Mathf.Clamp(isSliding[1]     - Time.deltaTime * isSliding[3], 0, isSliding[0]);
+        AirDashInfo[1]   = Mathf.Clamp(AirDashInfo[1]   - Time.deltaTime, 0, AirDashInfo[0]);
+
         isShooting[1] = Mathf.Clamp(isShooting[1] - Time.deltaTime, 0, isShooting[0]);
-        
-        WallJumpInfo[1] = Mathf.Clamp(WallJumpInfo[1] - Time.deltaTime, 0, WallJumpInfo[0]);
-        
-        isSliding[1] = Mathf.Clamp(isSliding[1] - Time.deltaTime * isSliding[3], 0, isSliding[0]);
-        
-        isVaulting[1] = Mathf.Clamp(isVaulting[1] - Time.deltaTime, 0, isVaulting[0]);
-        //isVaulting[2] being set to 0 is handled in the Update function
-        //this isVaulting[1] counter handles if you're in a vault state
+        ChargeFactor[1] = Mathf.Clamp(ChargeFactor[1] + Time.deltaTime, 0, ChargeFactor[0]);
 
-        if (isSwinging[2] == 1)
-            isSwinging[1] = Mathf.Clamp(isSwinging[1] - Time.deltaTime, 0, isSwinging[0]);
-
-        if (isGrounded())
-            isSwinging[1] = 0;
-        
-
-
-        AirDashInfo[1] = Mathf.Clamp(AirDashInfo[1] - Time.deltaTime, 0, AirDashInfo[0]);
-
-        if (ChargeFactor[2] == 1)
-            ChargeFactor[1] = Mathf.Clamp(ChargeFactor[1] + Time.deltaTime, 0, ChargeFactor[0]);
 
         if (isGrounded())
         {
             AirDashReplenish();
+            isSwinging[1] = 0;
+            if (isVaulting[1] > 0 ) isVaulting[1] = 0;
         }
 
-        if (isSliding[1] <= 0 || !isGrounded()) //if no longer sliding or dashing and you're not grounded,
+        if (isSliding[1] <= 0 || !isGrounded()) //if no longer sliding or you're not grounded,
         {
             isSliding[2] = 0;         
         }
 
-        if (isVaulting[1] > 0 &&  isGrounded() && isSliding[1] <= 0)
-        {
-           isVaulting[1] = 0;
-        }
 
-        if (isVaulting[1] == 0)
-        {
-            isVaulting[2] = 0;
-        }
+        if (isVaulting[1] <= 0) isVaulting[2] = 0;
 
         if (isSwinging[1] <= 0) isSwinging[2] = 0;
 
+        //Rolling Cooldown
         if (Mathf.Abs(rb.velocity.x) < Mathf.Abs(facing[0])|| !isGrounded() || !isCrouching)
         {
             isRolling = false;
         }
 
+        //Revive Cooldown
         if (isKO[4] <= 0 && isKO[2] > 0)
         {
             isKO[2] = 0;
@@ -371,9 +375,9 @@ public class PlayerControl : Being
             {
 
                 //drag the player down
-                if (((isKO[1] < isJumping[0] / isJumping[4]) || rb.velocity.y <= 0) && isKO[1] > 0)
+                if (((isKO[1] < isJumping[0] / jumpNuance[1]) || rb.velocity.y <= 0) && isKO[1] > 0)
                 {
-                    isKO[1] -= isJumping[5];
+                    isKO[1] -= jumpNuance[2];
 
                     rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y - isJumping[1]);
                 }
@@ -387,29 +391,50 @@ public class PlayerControl : Being
         }
 
 
-        //if jumping
+        //if we are pressing the jump button
         if (isJumping[2] > 0)
         {
             //if you hit the apex of your jump, then set the isJumping boolean to false
-            if (isJumping[1] <= 0 || rb.velocity.y <= 0)
+            //it'd be as if you aren't holding the jump button anymore
+            //if (isJumping[1] <= 0 || rb.velocity.y <= 0)
+            if (rb.velocity.y <= 0)
             {
                 isJumping[2] = 0;
             }
         }
 
+        //if we are NOT pressing the jump button
         else
         {
-            if (((isJumping[1] < isJumping[0] / isJumping[4]) || rb.velocity.y <= 0) && isJumping[1] > 0)
-            {
-                isJumping[1] -= isJumping[5];
+            //if isJumping[1] is not 0 yet, meaning Floe is still rising in her jump
+            //implying a SHORT JUMP is being performed
+            //if (((isJumping[1] < isJumping[0] / isJumping[4]) || rb.velocity.y <= 0) && isJumping[1] > 0)
+            //if ((rb.velocity.y <= 0) && isJumping[1] > 0)
+            //-----------
 
-                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y - isJumping[1]);
+            //if current jump count < jump cuttoff (ShortJump Mechanic)            
+            if (((isJumping[1] < jumpNuance[1])))// || rb.velocity.y <= 0))// && isJumping[1] > 0)
+            {
+                //isJumping[1] -= isJumping[5];
+                //isJumping[1] -= jumpNuance[2];
+                //-------------
+                { 
+                    //reduce the y velocity by what the isJumping[1] value is
+                    //since isJumping[1] is constantly decreasing in CooldownCount(),
+                    //then the decrease is more dynamic and refined
+                    //this means that our upwards acceleration is decreasing,
+                    //but the rate of decreasing itself is decreasing as time passes
+                    //giving the smooth decrease in speed as the player rises up
+                }
+                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y - isJumping[1]); 
             }
 
-            if (isJumping[1] == 0)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y);
-            }
+
+            //if you're no longer jumping and are just falling
+            //if (isJumping[1] == 0)
+            //{
+            //    rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y);
+            //}
 
         }
 
@@ -506,7 +531,8 @@ public class PlayerControl : Being
         }
 
 
-
+        //GravityChange is being called under specific states and circumstances here.
+        //So we can't just call it at the end as a catch-all case
         
     }
 
@@ -527,8 +553,8 @@ public class PlayerControl : Being
     public void OnMove(InputAction.CallbackContext context)
     {
 
-        float inputx = context.ReadValue<Vector2>().x;
-        float inputy = context.ReadValue<Vector2>().y;
+        inputx = context.ReadValue<Vector2>().x;
+        inputy = context.ReadValue<Vector2>().y;
 
         if (inputx < -Deadzonex) hor = -1;
         else if (inputx > Deadzonex) hor = 1;
@@ -571,43 +597,43 @@ public class PlayerControl : Being
             //Wall Jump
             else if (isOnWall() && !isGrounded())
             {
-                
+
                 CooldownStart("WallJump");
             }
 
-            //Swing Jump
-            else if (isSwinging[2] > 0)
+            else //Regular Jump Conditions
             {
-                //Debug.Log("Swing Jump");
+                //Swing Jump
+                if (isSwinging[2] > 0)
+                {
+                    //End the swing
+                    isSwinging[1] = 0;
+                    isSwinging[2] = 0;
 
-                isSwinging[1] = 0;
-                isSwinging[2] = 0;
+                    //Resume the velocity to what it was before going on the swing
+                    rb.velocity = SwingSpeed;
 
-                rb.velocity = SwingSpeed;
 
-                CooldownStart("Jump");
+                    CooldownStart("Jump");
 
-                isClimbing = false;
+                }
 
-                anim.SetTrigger("Jump");
+
+                //Mount Jump
+                if (MountStatus())
+                {
+                    Mount(null);
+                    CooldownStart("Jump");
+                }
+
+                //regular jump
+                else if ((isGrounded() && !isCrouching) || isClimbing)
+                {
+                    CooldownStart("Jump");
+                    //the other checks are necessary, because you could want to jump even when not grounded
+                }
 
             }
-
-
-            //Mount Jump
-            else if (MountStatus())
-            {
-                Mount(null);
-                CooldownStart("Jump");
-            }
-
-            //regular jump
-            else if ((isGrounded() && !isCrouching) || isClimbing)
-            {
-                CooldownStart("Jump");
-            }
- 
-            
         }
 
 
@@ -765,7 +791,8 @@ public class PlayerControl : Being
 
     private void WallMovementCheck()
     {
-        if (isOnWall() && !isGrounded() && hor == facing[0])
+        //use inputx instead of hor, since hor can be stuck being 0 if you're crouching and cannot refresh while vaulting
+        if (isOnWall() && !isGrounded() && Mathf.Sign(inputx) == Mathf.Sign(facing[0]))
         {
             if (isVaulting[1] > 0 || isWallRunning) //if we hit a wall while Vaulting or already WallRUnnning
             {
