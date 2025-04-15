@@ -431,11 +431,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83b9197540cb6a5479bd54c51a44a1bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
+  Type: 1
   Endpoints:
   - {fileID: 6279400878533031984}
   - {fileID: 8527622840794478601}
-  LerpValue: 0
+  LerpValue: 1
   PauseCountdown:
   - 3
   - 3
@@ -443,6 +443,7 @@ MonoBehaviour:
   direction: 1
   Speed: 1
   Platform: {fileID: 388486011673920237}
+  canMove: 0
 --- !u!1 &3159975531907256479
 GameObject:
   m_ObjectHideFlags: 0

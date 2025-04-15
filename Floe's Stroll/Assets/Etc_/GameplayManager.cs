@@ -88,7 +88,7 @@ public class GameplayManager : MonoBehaviour
     {
         //Debug.Log(Input.GetJoystickNames());
         if (GM == null) Awake();
-        Debug.Log(GM.name);
+        //Debug.Log(GM.name);
         TimeCalc();
         if(numPlayers == 1)
             SinglePlayerScoreCalc();

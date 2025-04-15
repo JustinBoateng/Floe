@@ -212,7 +212,7 @@ public class PlayerControl : Being
             case "Vault":
                 ResetStates("Vault");
                 //isVaulting = true;
-                //Debug.Log("Vault Activated");
+                Debug.Log("Vault Activated");
 
                 isVaulting[1] = isVaulting[0];
                 isVaulting[2] = 1; //isVaulting = true
@@ -271,7 +271,7 @@ public class PlayerControl : Being
         {
             AirDashReplenish();
             isSwinging[1] = 0;
-            if (isVaulting[1] > 0 ) isVaulting[1] = 0;
+            //if (isVaulting[1] > 0 ) isVaulting[1] = 0;
         }
 
         if (isSliding[1] <= 0 || !isGrounded()) //if no longer sliding or you're not grounded,
@@ -569,6 +569,7 @@ public class PlayerControl : Being
     public void onJump(InputAction.CallbackContext context)
     {
 
+        Debug.Log("Button Pressed: " + context);
 
         //Dropdown
         if (context.started && isCrouching && isOnPlatform && bc.enabled == true)
@@ -587,9 +588,11 @@ public class PlayerControl : Being
 
         else if (context.performed) 
         {
+            //Debug.Log("Button Performed");
             //vault
             if (isSliding[2] == 1) //if sliding and you jump
             {
+                Debug.Log("Vault Activated");
                 CooldownStart("Vault");
             }
 

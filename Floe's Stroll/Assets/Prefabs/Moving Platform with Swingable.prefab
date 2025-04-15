@@ -833,6 +833,7 @@ MonoBehaviour:
   direction: 1
   Speed: 0.7
   Platform: {fileID: 1762007292359822169}
+  canMove: 0
 --- !u!1 &6040549712936366118
 GameObject:
   m_ObjectHideFlags: 0
@@ -958,7 +959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83b9197540cb6a5479bd54c51a44a1bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 0
+  Type: 1
   Endpoints:
   - {fileID: 6344873585552406955}
   - {fileID: 9140527137671512593}
@@ -970,6 +971,7 @@ MonoBehaviour:
   direction: 1
   Speed: 0.7
   Platform: {fileID: 1762007292359822169}
+  canMove: 0
 --- !u!1 &7449877760233736628
 GameObject:
   m_ObjectHideFlags: 0

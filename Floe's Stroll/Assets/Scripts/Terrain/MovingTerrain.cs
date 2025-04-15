@@ -8,6 +8,7 @@ public class MovingTerrain : MonoBehaviour
     //1 for moving back and forth
     //2 for moving in one direction and then dissapearing
     //3 for rotating
+    //4 for being activated via a switch (moving only when activated)
 
     [SerializeField] Transform[] Endpoints = new Transform[2];
     [SerializeField] float LerpValue;
@@ -19,30 +20,44 @@ public class MovingTerrain : MonoBehaviour
 
     [SerializeField] Transform Platform;
 
-    //[SerializeField] BoxCollider2D bc;
+    [SerializeField] bool canMove;
 
     void Start()
     {
         PauseCountdown[1] = PauseCountdown[0];
+        LerpValue = 0;
+        Platform.transform.position = Vector2.Lerp(Endpoints[0].position, Endpoints[1].position, LerpValue);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (PauseCountdown[2] == 0)
-        {
-            LerpValue = Mathf.Clamp(LerpValue += (Time.deltaTime * Speed * direction), 0, 1);
+        switch (Type) {
+            case 1:
+                if (PauseCountdown[2] == 0)
+                {
+                    LerpValue = Mathf.Clamp(LerpValue += (Time.deltaTime * Speed * direction), 0, 1);
 
-            if (LerpValue <= 0 || LerpValue >= 1)
-            {
-                direction *= -1;
-                PauseCountdown[2] = 1;
-            }
+                    if (LerpValue <= 0 || LerpValue >= 1)
+                    {
+                        direction *= -1;
+                        PauseCountdown[2] = 1;
+                    }
 
-            Platform.transform.position = Vector2.Lerp(Endpoints[0].position, Endpoints[1].position, LerpValue);
-        }
-        if (PauseCountdown[2] == 1) {
+                    Platform.transform.position = Vector2.Lerp(Endpoints[0].position, Endpoints[1].position, LerpValue);
+                }
+                if (PauseCountdown[2] == 1) {
             Halt();
+        }
+                break;
+
+            case 4:
+                if (canMove)
+                {
+                    LerpValue = Mathf.Clamp(LerpValue += (Time.deltaTime * Speed * direction), 0, 1);
+                    Platform.transform.position = Vector2.Lerp(Endpoints[0].position, Endpoints[1].position, LerpValue);
+                }
+                break;
         }
     }
 
@@ -80,7 +95,12 @@ public class MovingTerrain : MonoBehaviour
             collision.transform.SetParent(null);
         }
     }
-
     //even if the platform already has colliders, as long as one of them is a trigger, the above two functions should work.
     //just make sure this script is attached to an object with that very same collider
+
+    public void TerrainActivate()
+    {
+        canMove = true;
+    }
+
 }

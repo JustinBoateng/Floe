@@ -389,6 +389,8 @@
 "Assets/Scripts/InputScripts/PlayerInputHandler.cs"
 "Assets/Scripts/Oil&WaterMenu/OWMenuManager.cs"
 "Assets/Scripts/Oil&WaterMenu/PlayerControllerRep.cs"
+"Assets/Scripts/Switch.cs"
+"Assets/Scripts/SwitchSystem.cs"
 "Assets/Scripts/Terrain/Breakable.cs"
 "Assets/Scripts/Terrain/CameraController.cs"
 "Assets/Scripts/Terrain/Checkpoints.cs"

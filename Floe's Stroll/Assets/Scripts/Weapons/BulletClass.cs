@@ -210,7 +210,8 @@ public class BulletClass : Hitbox
             }
         }
 
-        if ((collision.tag == "Ground" && BreaksOnGround) || (collision.tag == "Wall" && BreaksOnWall) && ySpeed != 0)
+        //check if ySpeed != 0 since you dont want it to crash on the floor if it's not aimed directly at the floor
+        if ((collision.tag == "Ground" && BreaksOnGround && ySpeed != 0) || (collision.tag == "Wall" && BreaksOnWall) || collision.tag == "Switch" )
         {
             //Debug.Log(GameplayManager.GM);
             //Debug.Log(SignatureNumber);
