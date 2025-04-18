@@ -377,6 +377,7 @@
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2022.3.30f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 "Assets/Etc_/GameplayManager.cs"
 "Assets/Scripts/Being.cs"
+"Assets/Scripts/BodyOfWater.cs"
 "Assets/Scripts/Climbable.cs"
 "Assets/Scripts/Collectable.cs"
 "Assets/Scripts/CollectionTracker.cs"

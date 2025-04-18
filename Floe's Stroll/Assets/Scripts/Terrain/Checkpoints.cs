@@ -7,7 +7,7 @@ public class Checkpoints : MonoBehaviour
     [SerializeField] int CheckNumber;
     [SerializeField] int numSprites;
     [SerializeField] Sprite[] Visuals;
-    [SerializeField] bool isPassed, isLast;
+    [SerializeField] public bool isPassed, isGoal;
     [SerializeField] BoxCollider2D bc;
     [SerializeField] SpriteRenderer SR;
     
@@ -16,8 +16,10 @@ public class Checkpoints : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SR = GetComponent<SpriteRenderer>();
-        bc = GetComponent<BoxCollider2D>();
+        if(!SR)
+            SR = GetComponent<SpriteRenderer>();
+        if (!bc)
+            bc = GetComponent<BoxCollider2D>();
 
         SR.sprite = Visuals[0];
 

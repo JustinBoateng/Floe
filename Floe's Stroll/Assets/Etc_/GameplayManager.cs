@@ -36,6 +36,8 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField] Checkpoints[] Checkpoints;
     [SerializeField] int FurthestCheckpoint;
+    [SerializeField] bool StageFinished = false;
+
     [SerializeField] GameObject CurrentMainPlayer;
 
 
@@ -79,6 +81,8 @@ public class GameplayManager : MonoBehaviour
         PlayerHealthBars[1].setHealth(PlayerHealth[1]);
 
         Timer[1] = Timer[0];
+
+        StageFinished = false;
 
         PlacePlayer();
     }
@@ -200,6 +204,10 @@ public class GameplayManager : MonoBehaviour
     {
         FurthestCheckpoint = Mathf.Max(FurthestCheckpoint, n);
 
+        if (Checkpoints[FurthestCheckpoint].isGoal)
+        {
+            StageFinished = true;
+        }
     }
 
     public void PlacePlayer()

@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 
 public class Health : MonoBehaviour
 {
+    [SerializeField] public float NormalizedRatio;
     [SerializeField] public float StartingHealth;
     [SerializeField] public float currentHealth;
     //[SerializeField] public float currentHealth { get; private set; }
@@ -28,6 +29,7 @@ public class Health : MonoBehaviour
 
     private void Awake()
     {
+        NormalizedRatio = 100 / StartingHealth;
         currentHealth = StartingHealth;
         Downed = false;
     }
@@ -44,8 +46,11 @@ public class Health : MonoBehaviour
 
     private void Update()
     {
-        if(currHealthBar)
+        if (currHealthBar)
+        {
+            Debug.Log(currentHealth / StartingHealth);
             currHealthBar.fillAmount = currentHealth / StartingHealth;
+        }
         //Fill Amount can be between 1 and 0
 
         if (tookDamageRecoil[1] > 0)

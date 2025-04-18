@@ -99,8 +99,10 @@ public class PlayerControl : Being
     [SerializeField] float RollDecay = 0.5f;
     [SerializeField] float SlopeCoefficient = 0.7f;
     
-    [SerializeField] float[] isHurt = new float[2]; //used for the Hurt animation
-    [SerializeField] float[] isKO = new float[4]; //used for the KO animation
+    [SerializeField] public bool    coinFlip = false; //used for the Hurt animation
+    [SerializeField] public float   isInvul; //used for the Hurt animation
+    [SerializeField] public float[] isHurt = new float[2]; //used for the Hurt animation
+    [SerializeField] public float[] isKO = new float[4]; //used for the KO animation
     //1: Max, 2: Curr, 3: isKO'd (First three for KO Animation)
     //4: MaxReviveTimer, 5: CurrReviveTimer
 
@@ -152,26 +154,6 @@ public class PlayerControl : Being
 
     }
 
-    public void InvulnurableCheck()
-    {
-        if (isWaterfallClimbing)
-        {
-            bc.isTrigger = true;
-        }
-
-        else
-        {
-            bc.isTrigger = false;
-        }
-
-        //Whether or not the Player isHurt is activated is done in the Health Script when a hitbox script object touches Floe.
-        if (isHurt[1] > 0)
-        {
-            tag = "Invulnurable";
-        }
-
-        else tag = "Player";
-    }
 
     //Update for physics
     void FixedUpdate()
@@ -189,25 +171,28 @@ public class PlayerControl : Being
         switch (z)
         {
             case "Jump":
-                anim.SetTrigger("Jump");
-
-                AirDashReplenish();
-
-                isJumping[1] = isJumping[0];
-                isJumping[2] = 1;
-
-                rb.velocity = Vector2.zero;
-                rb.AddForce(new Vector2(rb.velocity.x, jumpNuance[0]), ForceMode2D.Impulse);
-                //rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
-                //AddForce is used here to set up physics for any jumping.
-                //It's needed to get Floe off the ground.
-                //Maintaining that velocity is done in the Update Function
-
-                if (isClimbing || isWaterfallClimbing)
+                if (LockCountDown[1] <= 0)
                 {
-                    isClimbing = false;
-                    isWaterfallClimbing = false;
-                    this.transform.SetParent(null);
+                    anim.SetTrigger("Jump");
+
+                    AirDashReplenish();
+
+                    isJumping[1] = isJumping[0];
+                    isJumping[2] = 1;
+
+                    rb.velocity = Vector2.zero;
+                    rb.AddForce(new Vector2(rb.velocity.x, jumpNuance[0]), ForceMode2D.Impulse);
+                    //rb.AddForce(new Vector2(rb.velocity.x, isJumping[3]), ForceMode2D.Impulse);
+                    //AddForce is used here to set up physics for any jumping.
+                    //It's needed to get Floe off the ground.
+                    //Maintaining that velocity is done in the Update Function
+
+                    if (isClimbing || isWaterfallClimbing)
+                    {
+                        isClimbing = false;
+                        isWaterfallClimbing = false;
+                        this.transform.SetParent(null);
+                    }
                 }
                 break;
             case "Shoot":
@@ -224,9 +209,11 @@ public class PlayerControl : Being
                 break;            
             case "KO":
                 isKO[1] = isKO[0];
+                isInvul = isKO[1];
                 break;            
             case "Hurt":
                 isHurt[1] = isHurt[0];
+                isInvul = isHurt[0] * 2;
                 break;
             case "Dash":
                 isDashing[1] = isDashing[0];
@@ -279,6 +266,7 @@ public class PlayerControl : Being
     }
     private void CooldownCalc()
     {
+        isInvul          = Mathf.Clamp(isInvul          - Time.deltaTime, 0, isInvul); //for checing if you're in hitstun
         isHurt[1]        = Mathf.Clamp(isHurt[1]        - Time.deltaTime, 0, isHurt[0]); //for checing if you're in hitstun
         isKO[1]          = Mathf.Clamp(isKO[1]          - Time.deltaTime, 0, isKO[0]); //for checing if you're ko'd
         isKO[4]          = Mathf.Clamp(isKO[4]          - Time.deltaTime, 0, isKO[4]); //for revive timer
@@ -294,6 +282,20 @@ public class PlayerControl : Being
 
         isShooting[1] = Mathf.Clamp(isShooting[1] - Time.deltaTime, 0, isShooting[0]);
         ChargeFactor[1] = Mathf.Clamp(ChargeFactor[1] + Time.deltaTime, 0, ChargeFactor[0]);
+
+        if(isInvul > 0)
+        {
+            if (!coinFlip)
+                sr.color = new Color(255, 255, 255, 0);
+            else
+                sr.color = new Color(255, 255, 255, 255);
+            coinFlip = !coinFlip;
+
+        }
+
+        else
+            sr.color = new Color(255, 255, 255, 255);
+
 
 
         if (isGrounded())
@@ -362,6 +364,9 @@ public class PlayerControl : Being
         //anim.SetFloat("isCharging", ChargeFactor[1]);
         anim.SetFloat("isKO", isKO[2]);
 
+        //use isUnderwater to show swimming frames
+        //anim.SetBool("isUnderwater", isUnderwater);
+
     }
     private void Movement()
     {
@@ -374,7 +379,7 @@ public class PlayerControl : Being
         walking = hor != 0;
 
         //Higher Gravity if Falling
-        if(rb.velocity.y < 0) 
+        if(rb.velocity.y < 0 && !isUnderwater) 
         {
             //cap the speed of which you fall to the ground
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y, -Speeds[0]));
@@ -462,6 +467,7 @@ public class PlayerControl : Being
                     //but the rate of decreasing itself is decreasing as time passes
                     //giving the smooth decrease in speed as the player rises up
                 }
+                if(!isUnderwater || isUnderwater && rb.velocity.y > 0)
                 rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y - isJumping[1]); 
             }
 
@@ -938,6 +944,7 @@ public class PlayerControl : Being
         inputLock = true;
     }
 
+
     private void SpeedManagement()
     {
         //This function dynamically alters what the current TopSpeed is, in order to give a sense of consistant momentum
@@ -1082,5 +1089,27 @@ public class PlayerControl : Being
         GameplayManager.GM.PlacePlayer();
         GameplayManager.GM.CameraCont.setTarget(this.transform);
     }
+
+    public void InvulnurableCheck()
+    {
+        if (isWaterfallClimbing)
+        {
+            bc.isTrigger = true;
+        }
+
+        else
+        {
+            bc.isTrigger = false;
+        }
+
+        //Whether or not the Player isHurt is activated is done in the Health Script when a hitbox script object touches Floe.
+        if (isInvul > 0)
+        {
+            tag = "Invulnurable";
+        }
+
+        else tag = "Player";
+    }
+
     #endregion
 }

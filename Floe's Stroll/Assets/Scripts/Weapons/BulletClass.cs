@@ -29,6 +29,9 @@ public class BulletClass : Hitbox
     [SerializeField] public Transform MountSpot;
     [SerializeField] public Being Rider;
 
+    //Squad is used to prevent enemies from hitting other enemies 
+
+
     [SerializeField] public string BulletType;
     [SerializeField] public bool isCrashed;
     [SerializeField] public Transform BasePosition;
@@ -132,11 +135,15 @@ public class BulletClass : Hitbox
         LifeExpectancy[2] = rate;
     }
 
-    public void setSignature(Being B)
+    //for enemies
+    /*
+    public void setSignature(Being B, string S)
     {
         Signature = B;
+        Squad = S;
     }
-    
+    */
+    //for players
     public void setSignature(Being B, int i)
     {
         Signature = B;
@@ -157,7 +164,8 @@ public class BulletClass : Hitbox
     {
         //Debug.Log(collision.name);
 
-        if ((collision.tag == "Player" || collision.tag == "Enemy") && collision.name != Signature.name)
+        //Check for collision
+        if ((collision.tag == "Player" || collision.tag == "Enemy") && collision.name != Signature.name && collision.GetComponent<Being>().Squad != Squad)
         {
             //Debug.Log(GameplayManager.GM);
             //Debug.Log(SignatureNumber);
@@ -166,37 +174,45 @@ public class BulletClass : Hitbox
 
             //GameplayManager.GM.ScoreUpdate(SignatureNumber, Power);
 
-            collision.GetComponent<Health>().TakeDamage(Power);
+            if (collision.name != Signature.name && collision.GetComponent<Being>().Squad != Squad)
+                //prevent a character from hitting someone else in their squad (prevent same team hitting)
+                //if (collision.GetComponent<Being>().Squad != Squad)
+                { 
+                    collision.GetComponent<Health>().TakeDamage(Power);
 
-            if (!collision.GetComponent<Health>().isDown())
-            {
-                if (collision.tag == "Enemy")
-                {
-                    collision.GetComponent<EnemyAI>().SetHitstun(Power, Signature.gameObject);
-
-                    //collision.GetComponent<Being>().setVelocity(Vector2.zero);
-                    if (collision.GetComponent<EnemyAI>().getArmor() <= 0)
+                    if (!collision.GetComponent<Health>().isDown())
                     {
-                        collision.GetComponent<Being>().setVelocity(Vector2.zero);
-                        collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
-                        //collision.GetComponent<EnemyAI>().resetArmor();
-                        //set knockback, THEN reset the armor
+                        if (collision.tag == "Enemy")
+                        {
+                            collision.GetComponent<EnemyAI>().SetHitstun(Power, Signature.gameObject);
+
+                            //collision.GetComponent<Being>().setVelocity(Vector2.zero);
+                            if (collision.GetComponent<EnemyAI>().getArmor() <= 0)
+                            {
+                                collision.GetComponent<Being>().setVelocity(Vector2.zero);
+                                collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
+                                //collision.GetComponent<EnemyAI>().resetArmor();
+                                //set knockback, THEN reset the armor
+                            }
+                            //Debug.Log("Enemy Destroyed this");
+
+                        }
+
+                        if (collision.tag == "Player")
+                        {
+                            collision.GetComponent<Being>().setVelocity(Vector2.zero);
+                            collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
+                        }
+
+                        //Debug.Log("Player did this if Enemy Didn't");
                     }
-                    //Debug.Log("Enemy Destroyed this");
-
+                    Crash();
                 }
 
-                if (collision.tag == "Player")
-                {
-                    collision.GetComponent<Being>().setVelocity(Vector2.zero);
-                    collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * facing[0], Knockback.y));
-                }
-
-                //Debug.Log("Player did this if Enemy Didn't");
-            }
-            Crash();
+            
         }
 
+        //Mount Mechanic
         if ((collision.tag == "Player" || collision.tag == "Enemy") && collision.name == Signature.name && isRidable)
         {
             if (   !collision.GetComponent<Being>().isGrounded()
@@ -244,9 +260,8 @@ public class BulletClass : Hitbox
         //else Debug.Log("Yeah, it aint in here dawg.");
     }
 
-    //bullets can be stood on by increasing it's mass in the rigidbody2D Component
-    //that way, Floe's weight doesn't bother it as much
-    
+
+    //Bullet Mount Mechanic
     public void OnTriggerStay2D(Collider2D collision)
     {
         if(MountSpot)

@@ -29,7 +29,7 @@ public class MidairSoldier : EnemyAI
 
         for (int i = 0; i < BulletAmmo.Length; i++)
         {
-            BulletAmmo[i].setSignature(this);
+            BulletAmmo[i].setSignature(this, Squad);
             BulletAmmo[i].setBasePosition(transform);
             BulletAmmo[i].gameObject.SetActive(false);
             BulletAmmo[i].tag = "Bullet";

@@ -8,6 +8,7 @@ public abstract class Being : MonoBehaviour
     [SerializeField] protected Transform GroundCheckLocation;
     [SerializeField] protected Transform MountCheckLocation;
     [SerializeField] protected BoxCollider2D bc;
+    [SerializeField] protected SpriteRenderer sr;
     [SerializeField] protected Rigidbody2D rb;
     [SerializeField] protected Animator anim;
 
@@ -17,6 +18,7 @@ public abstract class Being : MonoBehaviour
     [SerializeField] protected LayerMask ClimbLayer;
     [SerializeField] protected LayerMask WaterfallLayer;
     [SerializeField] protected LayerMask beingLayer;
+    [SerializeField] protected LayerMask underwaterLayer;
     [SerializeField] protected LayerMask PlayerLayer;
     //[SerializeField] protected LayerMask InvulnurableLayer;
     //[SerializeField] protected LayerMask InvincibleLayer;
@@ -24,6 +26,7 @@ public abstract class Being : MonoBehaviour
     [SerializeField] protected bool isOnPlatform;
     [SerializeField] protected bool isOnBeing;
     [SerializeField] protected bool isOnPlayer;
+    [SerializeField] protected bool isUnderwater;
     [SerializeField] protected GameObject currentMount;
 
     [SerializeField] protected float[] gravityAdjust;
@@ -31,7 +34,9 @@ public abstract class Being : MonoBehaviour
 
     [SerializeField] int[] AmmoCount = new int[2];
     //0: Max Amount, 1: Current Amount
-    string Name;
+    
+    //string Name;
+    [SerializeField] public string Squad;
 
     [SerializeField] public int[] facing = new int[2];
 
@@ -40,6 +45,7 @@ public abstract class Being : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         bc = GetComponent<BoxCollider2D>();
+        sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
 
         bc.enabled = true;
@@ -67,6 +73,7 @@ public abstract class Being : MonoBehaviour
         RaycastHit2D ray3 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, groundLayer);
         RaycastHit2D ray4 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, platformLayer);
         RaycastHit2D ray5 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, beingLayer);
+        RaycastHit2D ray6 = Physics2D.BoxCast(GroundCheckLocation.transform.position, new Vector2(bc.size.x, 1), 0, Vector2.down, 0, underwaterLayer);
 
 
         Debug.DrawRay(GroundCheckLocation.transform.position, Vector2.down, Color.red, 1);
@@ -76,14 +83,15 @@ public abstract class Being : MonoBehaviour
         isOnBeing = (ray5.collider != null) && (ray5.collider.name != this.name);
         isOnPlatform = ray4.collider != null;
         isOnPlayer = PRay1.collider;// != null && PRay2.collider && PRay3.collider != null;
+        isUnderwater = ray6.collider != null;
 
-        bool y = ray3.collider != null || isOnPlatform || isOnBeing || isOnPlayer;
+        bool y = ray3.collider != null || isOnPlatform || isOnBeing || isOnPlayer || isUnderwater;
 
         return y;
         //returns true if the ray hits a collider in the groundLayer.
     }
 
-    protected void GravityChange()
+    public void GravityChange()
     {
         //this occurs if you're in the air
         if (!isGrounded())
@@ -96,12 +104,13 @@ public abstract class Being : MonoBehaviour
             else if (rb.velocity.y <= 0)
             {
                 gravityAdjust[1] = gravityAdjust[0]; // set gA[1] back to normal (gA[0])
-                rb.gravityScale = gravityAdjust[2]; //current gravity is falling gravity
+                rb.gravityScale = gravityAdjust[2]; //current gravity is original gravity 
             }
         }
 
         else
-            rb.gravityScale = 1;
+            if(!isUnderwater)
+                rb.gravityScale = 1;
     }
 
     public void setVelocity(Vector2 V)
@@ -114,6 +123,7 @@ public abstract class Being : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         bc = GetComponent<BoxCollider2D>();
+        sr = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
 
         bc.enabled = true;

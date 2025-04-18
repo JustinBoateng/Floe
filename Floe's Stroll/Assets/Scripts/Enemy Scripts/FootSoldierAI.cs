@@ -35,7 +35,7 @@ public class FootSoldierAI : EnemyAI
 
         if (WeaponStick)
         {
-            WeaponStick.GetComponent<Hitbox>().setSignature(this);
+            WeaponStick.GetComponent<Hitbox>().setSignature(this, Squad);
             WeaponStick.gameObject.SetActive(false);
         }
     }
