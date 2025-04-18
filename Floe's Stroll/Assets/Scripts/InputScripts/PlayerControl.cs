@@ -42,6 +42,7 @@ public class PlayerControl : Being
     //[SerializeField] bool isOnPlatform = false;
     [SerializeField] bool isWallRunning = false;
     [SerializeField] bool isClimbing = false;
+    [SerializeField] bool isWaterfallClimbing = false;
     //[SerializeField] bool isVaulting = false;
     [SerializeField] bool walking;
     //[SerializeField] float JumpForce = 10;
@@ -51,7 +52,7 @@ public class PlayerControl : Being
 
     [SerializeField] float[] Speeds;
     [SerializeField] float TopSpeed;
-    //0: Falling, 1: Walk, 2: Run,
+    //0: Falling, 1: Walk, 2: Run, 3: ClimbingSpeed 4: WallRunning Speed  5: Swimming Speed  6: WaterfallSpeed
     //TopSpeed changed Dynamically
     //Should you have speeds for climbing as well?
 
@@ -145,8 +146,31 @@ public class PlayerControl : Being
 
         AimMovement();
 
+        InvulnurableCheck();
+
         //Debug.Log("Grounded: " + isGrounded());
 
+    }
+
+    public void InvulnurableCheck()
+    {
+        if (isWaterfallClimbing)
+        {
+            bc.isTrigger = true;
+        }
+
+        else
+        {
+            bc.isTrigger = false;
+        }
+
+        //Whether or not the Player isHurt is activated is done in the Health Script when a hitbox script object touches Floe.
+        if (isHurt[1] > 0)
+        {
+            tag = "Invulnurable";
+        }
+
+        else tag = "Player";
     }
 
     //Update for physics
@@ -179,8 +203,12 @@ public class PlayerControl : Being
                 //It's needed to get Floe off the ground.
                 //Maintaining that velocity is done in the Update Function
 
-                isClimbing = false;
-                
+                if (isClimbing || isWaterfallClimbing)
+                {
+                    isClimbing = false;
+                    isWaterfallClimbing = false;
+                    this.transform.SetParent(null);
+                }
                 break;
             case "Shoot":
                 isShooting[1] = isShooting[0];
@@ -251,6 +279,7 @@ public class PlayerControl : Being
     }
     private void CooldownCalc()
     {
+        isHurt[1]        = Mathf.Clamp(isHurt[1]        - Time.deltaTime, 0, isHurt[0]); //for checing if you're in hitstun
         isKO[1]          = Mathf.Clamp(isKO[1]          - Time.deltaTime, 0, isKO[0]); //for checing if you're ko'd
         isKO[4]          = Mathf.Clamp(isKO[4]          - Time.deltaTime, 0, isKO[4]); //for revive timer
         LockCountDown[1] = Mathf.Clamp(LockCountDown[1] - Time.deltaTime, 0, LockCountDown[0]);        
@@ -272,6 +301,12 @@ public class PlayerControl : Being
             AirDashReplenish();
             isSwinging[1] = 0;
             //if (isVaulting[1] > 0 ) isVaulting[1] = 0;
+            //Detach from Climbing if you are g
+            if (isClimbing)
+            {
+                isClimbing = false;
+                transform.SetParent(null);
+            }
         }
 
         if (isSliding[1] <= 0 || !isGrounded()) //if no longer sliding or you're not grounded,
@@ -350,8 +385,9 @@ public class PlayerControl : Being
         {
             facingCalc();
         }
+
         
-        
+
         //Checking for walls is done at all times
         WallMovementCheck();
         CrouchRollCheck();
@@ -455,7 +491,20 @@ public class PlayerControl : Being
             AirDashReplenish(); //replenish airdash when climbing
             isClimbing = true;
             rb.gravityScale = 0;
-            rb.velocity = new Vector2(hor * Speeds[1], ver * Speeds[1]);
+            rb.velocity = new Vector2(hor * Speeds[3], ver * Speeds[3]);
+
+            this.transform.SetParent(TerrainObject);
+        }
+
+        //if WaterfallClimbing
+        else if (canWaterfallClimb() && ver == 1 || isWaterfallClimbing)
+        {
+            //Debug.Log("Waterfall Climbing");
+            AirDashReplenish(); //replenish airdash when climbing
+            isWaterfallClimbing = true;
+            rb.gravityScale = 0;
+            rb.velocity = new Vector2(0, Speeds[6]);
+
         }
 
         // if wall jumping
@@ -469,7 +518,7 @@ public class PlayerControl : Being
         }
 
         //if Vaulting
-        else if (isVaulting[2] == 1) 
+        else if (isVaulting[2] == 1)
         {
             //Debug.Log("Vaulting");
             rb.velocity = new Vector2(VaultForce.x * facing[0], VaultForce.y);
@@ -479,7 +528,7 @@ public class PlayerControl : Being
         //check if vaulting before if sliding. Vaulting is more situational than sliding
 
         //if sliding
-        else if (isSliding[2] == 1) 
+        else if (isSliding[2] == 1)
         {
             //Debug.Log("Sliding");
             rb.velocity = new Vector2(isSliding[1] * facing[0], rb.velocity.y);
@@ -488,7 +537,7 @@ public class PlayerControl : Being
         }
 
         //if rolling
-        else if (isRolling) 
+        else if (isRolling)
         {
             GravityChange();
             SlopeCoefficient = rb.velocity.y < 0 ? .7f : 0;
@@ -503,7 +552,7 @@ public class PlayerControl : Being
 
         }
         // if air dashing
-        else if (AirDashInfo[1] > 0) 
+        else if (AirDashInfo[1] > 0)
         {
             rb.velocity = new Vector2(AirDashInfo[4] * facing[0], 0);
         }
@@ -519,7 +568,8 @@ public class PlayerControl : Being
                 //currSpeed depends on if isDashing[2] is equal to 1. If yes, then Speeds[2], if no, then Speeds[1]
                 //currSpeed will adjust our horizontal ground speed depending on the boolean above
             }
-            if (!inputLock) {
+            if (!inputLock)
+            {
                 if (!isGrounded())
                     rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x + (hor * currSpeed), -TopSpeed, TopSpeed), rb.velocity.y);
                 else
@@ -758,10 +808,44 @@ public class PlayerControl : Being
     {   //Handles if you can climb or if you are no longer climbing. 
         //"If you are climbing" is handled in Movement()
         RaycastHit2D ClimbRay = Physics2D.BoxCast(bc.bounds.center, bc.bounds.size, 0, Vector2.down, 0.1f, ClimbLayer);
+        //RaycastHit2D WFallRay = Physics2D.BoxCast(bc.bounds.center, bc.bounds.size, 0, Vector2.down, 0.1f, WaterfallLayer);
         bool c = ClimbRay.collider != null;
+        //bool w = WFallRay.collider != null;
 
-        if (c == false) isClimbing = false;
+        if (c == false) { 
+            isClimbing = false;
+            TerrainObject = null;
+        }
+        else TerrainObject = ClimbRay.transform;
+
+        //if (w == false)
+        //{
+        //    isWaterfallClimbing = false;
+            //TerrainObject = null;
+        //}
         return c;
+    } 
+    
+    private bool canWaterfallClimb()
+    {   //Handles if you can WaterFallclimb or if you are no longer climbing. 
+        //"If you are climbing" is handled in Movement()
+        //RaycastHit2D ClimbRay = Physics2D.BoxCast(bc.bounds.center, bc.bounds.size, 0, Vector2.down, 0.1f, ClimbLayer);
+        RaycastHit2D WFallRay = Physics2D.BoxCast(bc.bounds.center, bc.bounds.size, 0, Vector2.down, 0.1f, WaterfallLayer);
+        //bool c = ClimbRay.collider != null;
+        bool w = WFallRay.collider != null;
+
+        //if (c == false) { 
+        //    isClimbing = false;
+        //    TerrainObject = null;
+        //}
+        //else TerrainObject = ClimbRay.transform;
+
+        if (w == false)
+        {
+            isWaterfallClimbing = false;
+            //TerrainObject = null;
+        }
+        return w;
     }
 
     private bool isOnWall()
@@ -781,7 +865,7 @@ public class PlayerControl : Being
         if (isGrounded())
         {
             if (hor > 0) facing[0] = 1;
-            else if (hor < 0) facing[0] = -1;
+            else if (hor < 0) facing[0] = -1;           
         }
 
 
@@ -801,7 +885,7 @@ public class PlayerControl : Being
             {
                 //Debug.Log("WallRunning");
                 isWallRunning = true;
-                rb.velocity = new Vector2(rb.velocity.x, Speeds[1]);
+                rb.velocity = new Vector2(rb.velocity.x, Speeds[4]);
             }
             
             else

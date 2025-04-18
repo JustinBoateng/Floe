@@ -15,8 +15,11 @@ public abstract class Being : MonoBehaviour
     [SerializeField] protected LayerMask groundLayer;
     [SerializeField] protected LayerMask wallLayer;
     [SerializeField] protected LayerMask ClimbLayer;
+    [SerializeField] protected LayerMask WaterfallLayer;
     [SerializeField] protected LayerMask beingLayer;
     [SerializeField] protected LayerMask PlayerLayer;
+    //[SerializeField] protected LayerMask InvulnurableLayer;
+    //[SerializeField] protected LayerMask InvincibleLayer;
 
     [SerializeField] protected bool isOnPlatform;
     [SerializeField] protected bool isOnBeing;

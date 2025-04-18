@@ -56,6 +56,10 @@ public class MovingTerrain : MonoBehaviour
                 {
                     LerpValue = Mathf.Clamp(LerpValue += (Time.deltaTime * Speed * direction), 0, 1);
                     Platform.transform.position = Vector2.Lerp(Endpoints[0].position, Endpoints[1].position, LerpValue);
+                    if(LerpValue == 1 || LerpValue == 0)
+                    {
+                        TerrainDeActivate();
+                    }
                 }
                 break;
         }
@@ -91,16 +95,22 @@ public class MovingTerrain : MonoBehaviour
         //if (collision.GetComponent<Being>())
         if (collision.tag == "Player")
         {
-            Debug.Log("Entered Platform");
+            //Debug.Log("Entered Platform");
             collision.transform.SetParent(null);
         }
     }
     //even if the platform already has colliders, as long as one of them is a trigger, the above two functions should work.
     //just make sure this script is attached to an object with that very same collider
 
-    public void TerrainActivate()
+    public void TerrainActivate(int i)
     {
         canMove = true;
+
+        direction = i;
     }
 
+    public void TerrainDeActivate()
+    {
+        canMove = false;
+    }
 }

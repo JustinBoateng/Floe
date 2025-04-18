@@ -286,7 +286,7 @@ public class BulletClass : Hitbox
             //GetComponentInChildren<Being>().transform.parent = null;
         }
 
-        //How iss the bullet destroyed?
+        //How is the bullet destroyed?
         switch (BulletType)
         {
             case "Basic":
