@@ -375,7 +375,12 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.UI.ref.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2022.3.30f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll"
 -analyzer:"C:/Program Files/Unity/Hub/Editor/2022.3.30f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
+"Assets/CinemaManager.cs"
 "Assets/Etc_/GameplayManager.cs"
+"Assets/File.cs"
+"Assets/FileManager.cs"
+"Assets/FileMenu.cs"
+"Assets/FileMenuObject.cs"
 "Assets/Scripts/Being.cs"
 "Assets/Scripts/BodyOfWater.cs"
 "Assets/Scripts/Climbable.cs"
@@ -400,7 +405,6 @@
 "Assets/Scripts/Terrain/MovingTerrain.cs"
 "Assets/Scripts/Terrain/Platform.cs"
 "Assets/Scripts/Terrain/Swingable.cs"
-"Assets/Scripts/Terrain/TransitionManager.cs"
 "Assets/Scripts/TitleScreen Scripts/MenuManager.cs"
 "Assets/Scripts/TitleScreen Scripts/TitleScreenManager.cs"
 "Assets/Scripts/TitleScreen Scripts/WipeManager.cs"
@@ -410,6 +414,7 @@
 "Assets/Scripts/Weapons/Blade.cs"
 "Assets/Scripts/Weapons/BulletClass.cs"
 "Assets/Scripts/Weapons/Hitbox.cs"
+"Assets/TransitionManager.cs"
 -langversion:9.0
 /deterministic
 /optimize+

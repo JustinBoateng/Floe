@@ -9,6 +9,8 @@ public class TitleScreenManager : MonoBehaviour
     [SerializeField] EventSystem ESRef;
     [SerializeField] Button[] ButtRefs;
 
+    //[SerializeField] GameObject[] Menus;
+
     // Start is called before the first frame update
     void Start()
     {

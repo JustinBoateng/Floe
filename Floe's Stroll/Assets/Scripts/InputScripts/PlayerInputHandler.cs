@@ -21,13 +21,13 @@ public class PlayerInputHandler : MonoBehaviour
         PIRef = GetComponent<PlayerInput>();
         index = PIRef.playerIndex;
 
-        var players = FindObjectsOfType<PlayerControl>();
-        if(players.Length != 0)
-        PCRef = players.FirstOrDefault(p => p.GetPlayerNumber() == index);
+        //var players = FindObjectsOfType<PlayerControl>();
+        //if(players.Length != 0)
+        //PCRef = players.FirstOrDefault(p => p.GetPlayerNumber() == index);
     
-        var TeamSelCursors = FindObjectsOfType<PlayerControllerRep>();
-        if(TeamSelCursors.Length != 0)
-        PCllRep = TeamSelCursors.FirstOrDefault(t => t.GetPlayerNumber() == index);
+        //var TeamSelCursors = FindObjectsOfType<PlayerControllerRep>();
+        //if(TeamSelCursors.Length != 0)
+        //PCllRep = TeamSelCursors.FirstOrDefault(t => t.GetPlayerNumber() == index);
 
         PIRef.SwitchCurrentActionMap("Player");
         //FindObjectsOfType gives us a list of all objects in the scene that is of the type in the <>
@@ -46,7 +46,7 @@ public class PlayerInputHandler : MonoBehaviour
     public void OnMove(InputAction.CallbackContext context)
     {
         Debug.Log("Moving Player: " + index);
-        PCllRep.OnMove(context);
+        //PCllRep.OnMove(context);
     }
     void Start()
     {

@@ -15,6 +15,7 @@ public class MenuManager : MonoBehaviour
 
     [SerializeField] GameObject TitleScreenRef;
     [SerializeField] GameObject MainMenuRef;
+    [SerializeField] GameObject FileMenuRef;
     [SerializeField] GameObject OilAndWaterRef;
     [SerializeField] GameObject StageSelectRef;
     [SerializeField] GameObject SettingsRef;
@@ -58,6 +59,7 @@ public class MenuManager : MonoBehaviour
         //Assuming that we are in the Title Screen
         TitleScreenRef.SetActive(true);
         MainMenuRef.SetActive(false);
+        FileMenuRef.SetActive(false);
         OilAndWaterRef.SetActive(false);
         StageSelectRef.SetActive(false);
         SettingsRef.SetActive(false);
@@ -93,6 +95,7 @@ public class MenuManager : MonoBehaviour
         {
             case "Title":
                 TitleScreenRef.SetActive(true);
+                FileMenuRef.SetActive(false);
                 MainMenuRef.SetActive(false);
                 OilAndWaterRef.SetActive(false); 
                 StageSelectRef.SetActive(false);
@@ -102,7 +105,18 @@ public class MenuManager : MonoBehaviour
 
             case "Main":
                 TitleScreenRef.SetActive(false);
+                FileMenuRef.SetActive(false);
                 MainMenuRef.SetActive(true);
+                OilAndWaterRef.SetActive(false);
+                StageSelectRef.SetActive(false);
+                SettingsRef.SetActive(false);
+                QuitGameRef.SetActive(false);
+                break;
+            
+            case "File":
+                TitleScreenRef.SetActive(false);
+                FileMenuRef.SetActive(true);
+                MainMenuRef.SetActive(false);
                 OilAndWaterRef.SetActive(false);
                 StageSelectRef.SetActive(false);
                 SettingsRef.SetActive(false);
@@ -111,6 +125,7 @@ public class MenuManager : MonoBehaviour
 
             case "OilAndWater":
                 TitleScreenRef.SetActive(false);
+                FileMenuRef.SetActive(false);
                 MainMenuRef.SetActive(false);
                 OilAndWaterRef.SetActive(true);
                 StageSelectRef.SetActive(false);
@@ -120,6 +135,7 @@ public class MenuManager : MonoBehaviour
 
             case "Settings":
                 TitleScreenRef.SetActive(false);
+                FileMenuRef.SetActive(false);
                 MainMenuRef.SetActive(false);
                 OilAndWaterRef.SetActive(false);
                 StageSelectRef.SetActive(false);

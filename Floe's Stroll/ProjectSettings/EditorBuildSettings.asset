@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/OilAndWaterMenu.unity
     guid: b9ba2a7c914909346998b5713b367ee8
+  - enabled: 1
+    path: Assets/Scenes/Cinema.unity
+    guid: 4dc347a4c72893b49a34a50094077d4c
   m_configObjects: {}
