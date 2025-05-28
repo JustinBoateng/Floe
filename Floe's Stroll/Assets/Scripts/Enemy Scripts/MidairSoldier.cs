@@ -39,11 +39,14 @@ public class MidairSoldier : EnemyAI
     // Update is called once per frame
     void Update()
     {
-        Monitor();
-        Hitstun = Mathf.Clamp(Hitstun -= Time.deltaTime, 0, Hitstun);
-        StateStatus();
+        if (!GameplayManager.GM.PauseOn)
+        {
+            Monitor();
+            Hitstun = Mathf.Clamp(Hitstun -= Time.deltaTime, 0, Hitstun);
+            StateStatus();
 
-        if (Launched) LaunchedCounter();
+            if (Launched) LaunchedCounter();
+        }
     }
 
     public void StateStatus()
@@ -198,7 +201,7 @@ public class MidairSoldier : EnemyAI
             int n = -1;
             for (int i = 0; i < BulletAmmo.Length; i++)
             {
-                Debug.Log("Adjusting Velocity of Bullets");
+                //Debug.Log("Adjusting Velocity of Bullets");
                 //BulletAmmo[i].GetComponent<Rigidbody2D>().AddForce(new Vector2(ThrowArc.x * j, ThrowArc.y));
                 //BulletAmmo[i].GetComponent<Rigidbody2D>().velocity = new Vector2(ThrowArc.x * j, ThrowArc.y);
                 BulletAmmo[i].isCrashed = false;

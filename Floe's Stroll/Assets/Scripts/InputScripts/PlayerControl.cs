@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerControl : Being
 {
@@ -126,6 +127,11 @@ public class PlayerControl : Being
 
     [SerializeField] Transform TerrainObject;
 
+    [SerializeField] bool isAutoMoving;
+    [SerializeField] float AMTimer;
+    [SerializeField] AutoMoveInstructions AMI;
+
+    [SerializeField] float[] UnpauseBuffer;
     // Start is called before the first frame update
     void Start()
     {
@@ -143,26 +149,49 @@ public class PlayerControl : Being
     // Update is called once per frame
     private void Update()
     {
-        CooldownCalc();
-        AnimCalc();
+        if (!GameplayManager.GM.PauseOn)
+        {
+            CooldownCalc();
+            AnimCalc();
 
-        AimMovement();
+            AimMovement();
 
-        InvulnurableCheck();
+            InvulnurableCheck();
 
-        //Debug.Log("Grounded: " + isGrounded());
-
+            //Debug.Log("Grounded: " + isGrounded());
+        }
     }
 
 
     //Update for physics
     void FixedUpdate()
     {
-        VelocityRef = rb.velocity;
+        if (GameplayManager.GM.GameOn && !GameplayManager.GM.PauseOn)
+        {
+            VelocityRef = rb.velocity;
 
-        Movement();
+            if (isAutoMoving)
+                AutoMoveCalc();
 
-        SpeedManagement();
+            else
+                Movement();
+
+
+            //(This function and the walking flag calls are moved outside of Movement function so that AutoMoveCalc can adjust where Floe's facing as well.)
+
+            //walking flag
+            walking = hor != 0;
+
+            //InputLock Dependent Checks 
+            if (!inputLock)
+            {
+                facingCalc();
+            }
+
+
+
+            SpeedManagement();
+        }
     }
 
 
@@ -283,6 +312,22 @@ public class PlayerControl : Being
         isShooting[1] = Mathf.Clamp(isShooting[1] - Time.deltaTime, 0, isShooting[0]);
         ChargeFactor[1] = Mathf.Clamp(ChargeFactor[1] + Time.deltaTime, 0, ChargeFactor[0]);
 
+        if (UnpauseBuffer[1] > 0)
+        {
+            UnpauseBuffer[1] = Mathf.Clamp(UnpauseBuffer[1] - Time.deltaTime, 0, UnpauseBuffer[1]);
+        }
+
+        if (isAutoMoving && AMI) {
+            AMTimer = Mathf.Clamp(AMTimer + Time.deltaTime, 0, AMI.getTimer(0));
+            if (AMTimer >= AMI.getTimer(0))
+            {
+                isAutoMoving = false;
+                hor = 0;
+            }
+        }
+
+
+
         if(isInvul > 0)
         {
             if (!coinFlip)
@@ -346,6 +391,7 @@ public class PlayerControl : Being
 
     private void AnimCalc()
     {
+
         //Set Animator Parameters
         anim.SetBool("Walking", walking);
         anim.SetFloat("Dashing", isDashing[2]);
@@ -370,14 +416,26 @@ public class PlayerControl : Being
     }
     private void Movement()
     {
+        Debug.Log("Movement State");
+
         //Debug.Log(rb.velocity.y);
+
+
+        //Checking for walls is done at all times
+        WallMovementCheck();
+
+        //Checks if you're Crouching and Rolling.
+        //We dont want to be able to crouch while in AutoMove mode. So have this function call be within Movement().
+        CrouchRollCheck();
+
+        //These should be outside InputLock too, so that we can have hor change while we are vaulting. We want to check if we're crouching EVEN IF we can't move. 
+
+
 
         //hor input cannot change if you're crouching
         if (isCrouching) hor = 0;
         
-        //walking flag
-        walking = hor != 0;
-
+        
         //Higher Gravity if Falling
         if(rb.velocity.y < 0 && !isUnderwater) 
         {
@@ -385,18 +443,9 @@ public class PlayerControl : Being
             rb.velocity = new Vector2(rb.velocity.x, Mathf.Max(rb.velocity.y, -Speeds[0]));
         }
 
-        //InputLock Dependent Checks
-        if (!inputLock)
-        {
-            facingCalc();
-        }
 
         
 
-        //Checking for walls is done at all times
-        WallMovementCheck();
-        CrouchRollCheck();
-        //Checks if you're Crouching and Rolling. This should be outside InputLock too, so that we can have hor change while we are vaulting. We want to check if we're crouching EVEN IF we can't move. 
 
         //if KO'd
         if (isKO[2] != 0)
@@ -550,6 +599,7 @@ public class PlayerControl : Being
             rb.velocity = new Vector2(rb.velocity.x + (RollDecay * -facing[0]) + (SlopeCoefficient * facing[0]), rb.velocity.y);
         }
 
+        //if Swinging
         else if (isSwinging[2] > 0)
         {
             rb.gravityScale = 0;
@@ -557,6 +607,7 @@ public class PlayerControl : Being
             this.transform.position = Vector2.Lerp(SwingEndpoints[0], SwingEndpoints[1], SwingLERPValue);
 
         }
+
         // if air dashing
         else if (AirDashInfo[1] > 0)
         {
@@ -592,8 +643,38 @@ public class PlayerControl : Being
         
     }
 
+    private void AutoMoveCalc()
+    {
+        Debug.Log("Automove State");
 
+        if ((int)transform.position.x < (int)AMI.getPos(0).transform.position.x)
+        {
+            facing[0] = 1;
+            hor = 1;
+            //rb.velocity = new Vector2(hor * currSpeed, rb.velocity.y);
+        }
+        else if ((int)transform.position.x > (int)AMI.getPos(0).transform.position.x)
+        {
+            facing[0] = -1;
+            hor = -1;
+            //rb.velocity = new Vector2(hor * currSpeed, rb.velocity.y);
+        }
+        else hor = 0;
+            
+        rb.velocity = new Vector2(hor * currSpeed, rb.velocity.y);
+    }
+    
+    public void setAMI(AutoMoveInstructions a)
+    {
+        AMI = a;
+        isAutoMoving = true; 
+        AMTimer = 0;
+    }
 
+    public void flipAutoMode()
+    {
+        isAutoMoving = !isAutoMoving;
+    }
     #region DropDown Mechanic
     private IEnumerator DisablePlayerCollider(float disableTime)
     {
@@ -625,71 +706,78 @@ public class PlayerControl : Being
     public void onJump(InputAction.CallbackContext context)
     {
 
-        Debug.Log("Button Pressed: " + context);
+        //Debug.Log("Button Pressed: " + context);
+
+        //Have this eat any Jump Button Presses, since you dont want to jump and unpause at the same button press.
+        if (UnpauseBuffer[1] > 0) return;
 
         //Dropdown
-        if (context.started && isCrouching && isOnPlatform && bc.enabled == true)
+        if (context.started && isCrouching && isOnPlatform && bc.enabled == true && !isAutoMoving)
         {
             //Debug.Log("Dropping Down");
             StartCoroutine(  DisablePlayerCollider(DropdownTimer)  );
         }
 
         
-        else if ((context.canceled))
+        else if (context.canceled && !isAutoMoving)
         {
             isJumping[2] = 0;
             //if you let go of the button, set the isJumping boolean to false
             //This is for high jumping / quick jumping
         }
 
-        else if (context.performed) 
+        else if (context.performed && !isAutoMoving) 
         {
-            //Debug.Log("Button Performed");
-            //vault
-            if (isSliding[2] == 1) //if sliding and you jump
+            if (!GameplayManager.GM.PauseOn)
             {
-                Debug.Log("Vault Activated");
-                CooldownStart("Vault");
-            }
-
-
-            //Wall Jump
-            else if (isOnWall() && !isGrounded())
-            {
-
-                CooldownStart("WallJump");
-            }
-
-            else //Regular Jump Conditions
-            {
-                //Swing Jump
-                if (isSwinging[2] > 0)
+                //Debug.Log("Button Performed");
+                //vault
+                if (isSliding[2] == 1) //if sliding and you jump
                 {
-                    //End the swing
-                    isSwinging[1] = 0;
-                    isSwinging[2] = 0;
-
-                    //Resume the velocity to what it was before going on the swing
-                    rb.velocity = SwingSpeed;
-
-
-                    CooldownStart("Jump");
-
+                    Debug.Log("Vault Activated");
+                    CooldownStart("Vault");
                 }
 
 
-                //Mount Jump
-                if (MountStatus())
+                //Wall Jump
+                else if (isOnWall() && !isGrounded())
                 {
-                    Mount(null);
-                    CooldownStart("Jump");
+
+                    CooldownStart("WallJump");
                 }
 
-                //regular jump
-                else if ((isGrounded() && !isCrouching) || isClimbing)
+                else //Regular Jump Conditions
                 {
-                    CooldownStart("Jump");
-                    //the other checks are necessary, because you could want to jump even when not grounded
+                    //Swing Jump
+                    if (isSwinging[2] > 0)
+                    {
+                        //End the swing
+                        isSwinging[1] = 0;
+                        isSwinging[2] = 0;
+
+                        //Resume the velocity to what it was before going on the swing
+                        rb.velocity = SwingSpeed;
+
+
+                        CooldownStart("Jump");
+
+                    }
+
+
+                    //Mount Jump
+                    if (MountStatus())
+                    {
+                        Mount(null);
+                        CooldownStart("Jump");
+                    }
+
+                    //regular jump
+                    else if ((isGrounded() && !isCrouching) || isClimbing)
+                    {
+                        CooldownStart("Jump");
+                        //the other checks are necessary, because you could want to jump even when not grounded
+                    }
+
                 }
 
             }
@@ -796,6 +884,15 @@ public class PlayerControl : Being
         }
     }
     #endregion
+
+    public void onPause(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            GameplayManager.GM.PauseButton();
+            UnpauseBuffer[1] = UnpauseBuffer[0];
+        }
+    }
 
     #region Constant Checks
     private void AimMovement()

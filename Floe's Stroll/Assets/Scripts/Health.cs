@@ -48,7 +48,7 @@ public class Health : MonoBehaviour
     {
         if (currHealthBar)
         {
-            Debug.Log(currentHealth / StartingHealth);
+            //Debug.Log(currentHealth / StartingHealth);
             currHealthBar.fillAmount = currentHealth / StartingHealth;
         }
         //Fill Amount can be between 1 and 0

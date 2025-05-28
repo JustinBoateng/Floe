@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-
+using UnityEngine.UI;
 
 public class GameplayManager : MonoBehaviour
 {
@@ -18,11 +19,10 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] Transform MainCharacter;
 
     [SerializeField] float ViewSize;
-    [SerializeField] float Time;
+    //[SerializeField] float currTime;
     [SerializeField] int[] Score;
     [SerializeField] PlayerControl[] Players;
 
-    [SerializeField] bool GameOn = false;
     [SerializeField] int Winner = 0;
     [SerializeField] Health[] PlayerHealth; 
     [SerializeField] HealthBar[] PlayerHealthBars;
@@ -40,6 +40,10 @@ public class GameplayManager : MonoBehaviour
 
     [SerializeField] GameObject CurrentMainPlayer;
 
+    [SerializeField] public bool GameOn = true;
+    [SerializeField] public bool PauseOn = false;
+    [SerializeField] GameObject UIPanel;
+    [SerializeField] Button ResumeButton;
 
     private void Awake()
     {
@@ -85,6 +89,8 @@ public class GameplayManager : MonoBehaviour
         StageFinished = false;
 
         PlacePlayer();
+
+        TurnOn();
     }
 
     // Update is called once per frame
@@ -216,4 +222,24 @@ public class GameplayManager : MonoBehaviour
         CurrentMainPlayer.GetComponent<Health>().HealthRefill();
     }
 
+    public void TurnOn()
+    {
+        GameOn = true;
+        PauseOn = true;
+        PauseButton();
+    }
+
+    public void PauseButton()
+    {
+        PauseOn = !PauseOn;
+
+        UIPanel.SetActive(PauseOn);
+
+        if (PauseOn)
+            Time.timeScale = 0;
+
+        else Time.timeScale = 1;
+
+        EventSystem.current.SetSelectedGameObject(ResumeButton.gameObject);
+    }
 }

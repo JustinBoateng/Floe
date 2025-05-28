@@ -292,7 +292,7 @@ public class BulletClass : Hitbox
 
         //play Animation coroutine
 
-        Debug.Log("Bullets Crashed");
+        //Debug.Log("Bullets Crashed");
 
         //Dismount
         if (Rider)

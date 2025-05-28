@@ -44,12 +44,15 @@ public class FootSoldierAI : EnemyAI
     // Update is called once per frame
     void Update()
     {
-        Monitor();
-        Hitstun = Mathf.Clamp(Hitstun -= Time.deltaTime, 0, Hitstun);
-        StateStatus();
+        if (!GameplayManager.GM.PauseOn)
+        {
+            Monitor();
+            Hitstun = Mathf.Clamp(Hitstun -= Time.deltaTime, 0, Hitstun);
+            StateStatus();
 
-        //put away the weapon if not attacking
-        if(CurrState != "Attack") WeaponStick.gameObject.SetActive(false);
+            //put away the weapon if not attacking
+            if (CurrState != "Attack") WeaponStick.gameObject.SetActive(false);
+        }
     }
 
     public void StateStatus()
