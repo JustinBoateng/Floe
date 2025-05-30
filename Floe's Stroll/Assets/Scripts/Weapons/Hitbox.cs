@@ -66,8 +66,9 @@ public class Hitbox : MonoBehaviour
         {
             //if (collision.GetComponent<BulletClass>().Signature != Signature) //if the hitboxes come from different people
             //if (collision.GetComponent<BulletClass>().Power >= Power)
-            //Crash();
-            Destroy(collision.gameObject);
+            Debug.Log("Hitbox Class called the Crash");
+            collision.GetComponent<BulletClass>().Crash();
+            //Destroy(collision.gameObject);
         }
         //Destroy(this.gameObject);
 

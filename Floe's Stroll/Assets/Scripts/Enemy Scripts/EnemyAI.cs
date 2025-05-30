@@ -22,6 +22,7 @@ public class EnemyAI : AI
     [SerializeField] protected float[] Launch_Countdown;
     //o: Max Cooldown, Curr Cooldown, Cooldown Rate 
 
+    [SerializeField] public int PointsWorth = 1;
     [SerializeField] protected string EnemyType;
     [SerializeField] protected GameObject Target;
     //[SerializeField] protected GameObject WeaponStick;

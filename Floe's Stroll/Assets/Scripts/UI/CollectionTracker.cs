@@ -60,4 +60,9 @@ public class CollectionTracker : MonoBehaviour
             CoinsDisplay.text = CoinsAmount.ToString();
         }
     }
+
+    public int getCoins()
+    {
+        return CoinsAmount;
+    }
 }

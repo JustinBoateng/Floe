@@ -80,7 +80,7 @@ public class MovingTerrain : MonoBehaviour
         //if (collision.GetComponent<Being>())
         if (collision.tag == "Player")
         {
-            Debug.Log("Entered Platform");
+            //Debug.Log("Entered Platform");
             collision.transform.SetParent(this.transform);
         }
     }

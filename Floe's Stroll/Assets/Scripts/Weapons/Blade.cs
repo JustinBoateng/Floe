@@ -30,7 +30,7 @@ public class Blade : Hitbox
 
             collision.GetComponent<Health>().TakeDamage(Power);
 
-            Debug.Log(Signature.name + " Hit: " + collision.name);
+            //Debug.Log(Signature.name + " Hit: " + collision.name);
 
             collision.GetComponent<Being>().setVelocity(Vector2.zero);
             collision.GetComponent<Being>().setVelocity(new Vector2(Knockback.x * f, Knockback.y));
@@ -40,7 +40,16 @@ public class Blade : Hitbox
         {
             if (collision.GetComponent<BulletClass>().Signature != Signature) //if the hitboxes come from different people
                 if (collision.GetComponent<BulletClass>().Power >= Power)
+                {
+                    Debug.Log("Bullet overpowered this weapon");
                     Crash();
+                }
+
+                else
+                {
+                    Debug.Log("Weapon destroyed bullet");
+                    collision.GetComponent<BulletClass>().Crash();
+                }
         }
         //Destroy(this.gameObject);
 

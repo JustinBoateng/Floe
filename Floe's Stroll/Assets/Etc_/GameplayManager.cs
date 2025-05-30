@@ -9,6 +9,9 @@ public class GameplayManager : MonoBehaviour
 {
     [SerializeField] public static GameplayManager GM;
 
+    [SerializeField] Stage[] StageList;
+    [SerializeField] int currStage;
+
     [SerializeField] int numPlayers;
     [SerializeField] GameObject[] PlayerPrefabs;
     [SerializeField] int currPF = 0;
@@ -30,16 +33,22 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] float[] Timer = new float[4];
     [SerializeField] Clock ClockRef;
     [SerializeField] CollectionTracker CollectRef;
-    //[Max Minutes, Minutes, Seconds, Milliseconds]
+    //[Max Minutes, CurrMinutes, Seconds, Milliseconds]
 
 
 
     [SerializeField] Checkpoints[] Checkpoints;
     [SerializeField] int FurthestCheckpoint;
-    [SerializeField] bool StageFinished = false;
+    [SerializeField] public bool StageFinished = false;
+    [SerializeField] public float[] StageFinishedEndlag = { 3f, 0f };
+    [SerializeField] StageClear StageClearUI;
+    [SerializeField] GameObject SCUILerpValue;
+
 
     [SerializeField] GameObject CurrentMainPlayer;
 
+
+    [SerializeField] public bool TimeCountUp = true; //true for TimeCalcUp, false for TimeCalcDown
     [SerializeField] public bool GameOn = true;
     [SerializeField] public bool PauseOn = false;
     [SerializeField] GameObject UIPanel;
@@ -64,7 +73,9 @@ public class GameplayManager : MonoBehaviour
         //if(CameraCont == null)
         //    CameraCont = GameObject.Find("Camera").GetComponent<CameraController>();
 
-        if(numPlayers <= 1)
+        TurnOn();
+
+        if (numPlayers <= 1)
         {
             //Debug.Log("Singleplayer Mode");
             CameraCont.setTarget(MainCharacter);
@@ -79,18 +90,14 @@ public class GameplayManager : MonoBehaviour
 
         PIU.playerPrefab = PlayerPrefabs[currPF];
 
-        PlayerHealth[0] = Players[0].GetComponent<Health>();
-        PlayerHealth[1] = Players[1].GetComponent<Health>();
-        PlayerHealthBars[0].setHealth(PlayerHealth[0]);
-        PlayerHealthBars[1].setHealth(PlayerHealth[1]);
+        //PlayerHealth[0] = Players[0].GetComponent<Health>();
+        //PlayerHealth[1] = Players[1].GetComponent<Health>();
+        //PlayerHealthBars[0].setHealth(PlayerHealth[0]);
+        //PlayerHealthBars[1].setHealth(PlayerHealth[1]);
 
-        Timer[1] = Timer[0];
-
-        StageFinished = false;
 
         PlacePlayer();
 
-        TurnOn();
     }
 
     // Update is called once per frame
@@ -99,9 +106,28 @@ public class GameplayManager : MonoBehaviour
         //Debug.Log(Input.GetJoystickNames());
         if (GM == null) Awake();
         //Debug.Log(GM.name);
-        TimeCalc();
-        if(numPlayers == 1)
-            SinglePlayerScoreCalc();
+        
+        
+
+        //We check if StageFinished and the Endlag are correct so that when the endlag finishes, we dont call P&C over and over again
+        if (StageFinished && StageFinishedEndlag[1] > 0)
+        {
+            StageFinishedEndlag[1] = Mathf.Clamp(StageFinishedEndlag[1] -= Time.deltaTime, 0, StageFinishedEndlag[0]);
+
+            if (StageFinishedEndlag[1] <= 0)
+            {
+                StageClearUI.PopulateandCalculate((int)Timer[1], (int)Timer[2], CollectRef.getCoins(), Score[0]);
+            }
+        }
+
+        if(!StageFinished)
+        {
+            if(TimeCountUp) TimeCalcUp();
+            else TimeCalcDown();
+
+            if (numPlayers == 1)
+                SinglePlayerScoreCalc();
+        }
     }
 
     public void NextPlayerSpawn()
@@ -145,14 +171,15 @@ public class GameplayManager : MonoBehaviour
         }
     }
 
-    private void TimeCalc()
+    private void TimeCalcDown()
     {
         //if (Timer[3] <= 0)
-        if ((int)(Timer[3]) > (int)(Timer[3] - UnityEngine.Time.deltaTime) || Timer[3] < 0)
+
+        if ((int)(Timer[3]) > (int)(Timer[3] + UnityEngine.Time.deltaTime) || Timer[3] <= 0)
         {
-            if (Timer[2] <= 0)
+            if (Timer[2] < 0)
             {
-                if (Timer[1] <= 0)
+                if (Timer[1] < 0)
                 {
                     GameOn = false;
                 }
@@ -175,7 +202,7 @@ public class GameplayManager : MonoBehaviour
 
             if (GameOn)
             {
-                Timer[3] = 99;
+                Timer[3] = 59;
             }
         }
 
@@ -186,6 +213,55 @@ public class GameplayManager : MonoBehaviour
             //    Timer[2] -= 1;
             //}
             Timer[3] -= UnityEngine.Time.deltaTime;
+        }
+
+        ClockRef.ClockUpdate(Timer[1], Timer[2], Timer[3]);
+    }
+
+    private void TimeCalcUp()
+    {
+        //if (Timer[3] <= 0)
+
+        if ((int)(Timer[3]) < (int)(Timer[3] + UnityEngine.Time.deltaTime) || Timer[3] >= 60)
+        {
+            if (Timer[2] > 59)
+            {
+                if (Timer[1] >= Timer[0])
+                {
+                    GameOn = false;
+                    Timer[2] = 59;
+                    Timer[1] = 59;
+                }
+
+                else Timer[1] += 1;
+
+
+                if (GameOn)
+                {
+                    Timer[2] = 0;
+                }
+
+            }
+
+            else
+            {
+                if (GameOn)
+                    Timer[2] += 1;
+            }
+
+            if (GameOn)
+            {
+                Timer[3] = 0;
+            }
+        }
+
+        if (GameOn)
+        {
+            //if ()
+            //{
+            //    Timer[2] -= 1;
+            //}
+            Timer[3] += UnityEngine.Time.deltaTime;
         }
 
         ClockRef.ClockUpdate(Timer[1], Timer[2], Timer[3]);
@@ -224,22 +300,41 @@ public class GameplayManager : MonoBehaviour
 
     public void TurnOn()
     {
+        if(TimeCountUp) Timer[1] = 0;
+        else Timer[1] = Timer[0];
+
+        StageFinished = false;
+        StageFinishedEndlag[1] = StageFinishedEndlag[0];
+
         GameOn = true;
         PauseOn = true;
         PauseButton();
+
+        Instantiate(StageList[currStage]);
+        Checkpoints = StageList[currStage].GetCheckpoints();
+
+
+    }
+
+    public void SetStage(int i)
+    {
+        currStage = i;
     }
 
     public void PauseButton()
     {
-        PauseOn = !PauseOn;
+        if (!StageFinished)
+        {
+            PauseOn = !PauseOn;
 
-        UIPanel.SetActive(PauseOn);
+            UIPanel.SetActive(PauseOn);
 
-        if (PauseOn)
-            Time.timeScale = 0;
+            if (PauseOn)
+                Time.timeScale = 0;
 
-        else Time.timeScale = 1;
+            else Time.timeScale = 1;
 
-        EventSystem.current.SetSelectedGameObject(ResumeButton.gameObject);
+            EventSystem.current.SetSelectedGameObject(ResumeButton.gameObject);
+        }
     }
 }

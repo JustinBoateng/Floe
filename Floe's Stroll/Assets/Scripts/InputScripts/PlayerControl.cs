@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class PlayerControl : Being
 {
 
-    [SerializeField] int PlayerNumber;
+    [SerializeField] public int PlayerNumber;
     [SerializeField] float hor;
     [SerializeField] float ver;
     [SerializeField] float inputx;
@@ -416,7 +416,7 @@ public class PlayerControl : Being
     }
     private void Movement()
     {
-        Debug.Log("Movement State");
+        //Debug.Log("Movement State");
 
         //Debug.Log(rb.velocity.y);
 
@@ -645,7 +645,7 @@ public class PlayerControl : Being
 
     private void AutoMoveCalc()
     {
-        Debug.Log("Automove State");
+        //Debug.Log("Automove State");
 
         if ((int)transform.position.x < (int)AMI.getPos(0).transform.position.x)
         {
@@ -709,7 +709,7 @@ public class PlayerControl : Being
         //Debug.Log("Button Pressed: " + context);
 
         //Have this eat any Jump Button Presses, since you dont want to jump and unpause at the same button press.
-        if (UnpauseBuffer[1] > 0) return;
+        if (UnpauseBuffer[1] > 0 || GameplayManager.GM.StageFinished) return;
 
         //Dropdown
         if (context.started && isCrouching && isOnPlatform && bc.enabled == true && !isAutoMoving)
@@ -734,7 +734,7 @@ public class PlayerControl : Being
                 //vault
                 if (isSliding[2] == 1) //if sliding and you jump
                 {
-                    Debug.Log("Vault Activated");
+                    //Debug.Log("Vault Activated");
                     CooldownStart("Vault");
                 }
 
@@ -790,6 +790,8 @@ public class PlayerControl : Being
 
     public void onDash(InputAction.CallbackContext context)
     {
+        if (UnpauseBuffer[1] > 0 || GameplayManager.GM.StageFinished) return;
+
         if (context.started && isGrounded())
         {            
 
@@ -831,8 +833,9 @@ public class PlayerControl : Being
 
     public void onShoot(InputAction.CallbackContext context)
     {
-        
-        if(context.started && isHurt[1] == 0) 
+        if (UnpauseBuffer[1] > 0 || GameplayManager.GM.StageFinished) return;
+
+        if (context.started && isHurt[1] == 0) 
         {
             ChargeFactor[2] = 1;
             ChargeFactor[1] = 0;
@@ -887,6 +890,8 @@ public class PlayerControl : Being
 
     public void onPause(InputAction.CallbackContext context)
     {
+        if (UnpauseBuffer[1] > 0 || GameplayManager.GM.StageFinished) return;
+
         if (context.started)
         {
             GameplayManager.GM.PauseButton();

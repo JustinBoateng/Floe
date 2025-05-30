@@ -95,15 +95,17 @@ public class Health : MonoBehaviour
             {
                 if(GetComponent<PlayerControl>())
                     GetComponent<PlayerControl>().CooldownStart("KO'd");
-                
+                //make it so that the player can't control the character anymore
+                //dead = true;
+
+
                 if (GetComponent<EnemyAI>())
                 {
                     Downed = true;
-                    Debug.Log("Enemy Defeated");
+                    //Debug.Log("Enemy Defeated");
+                    GameplayManager.GM.ScoreUpdate(0, BeingRef.GetComponent<EnemyAI>().PointsWorth);
                     Destroy(this.gameObject);
                 }
-                //make it so that the player can't control the character anymore
-                //dead = true;
             }
         }
     }

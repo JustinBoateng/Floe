@@ -32,7 +32,8 @@ public class Switch : MonoBehaviour
             SR.sprite = images[0];
         }
 
-        hitTimer[1] = hitTimer[0];
+        if(hitTimer.Length > 0)
+            hitTimer[1] = hitTimer[0];
 
     }
 
@@ -79,6 +80,7 @@ public class Switch : MonoBehaviour
             case "AutoMove":
                 //set the automove instructions attached to this switch to the collision.GetComponent<Player>().setAMI(a);
                 collision.GetComponent<PlayerControl>().setAMI(AMI);
+                bc.enabled = false;
                 break;
         }
     }
@@ -97,7 +99,7 @@ public class Switch : MonoBehaviour
     {
         //if (!isOneWay)  hitTimer[1] = hitTimer[0]; //set hitTimer to max
 
-        Debug.Log("Switch Hit");
+        //Debug.Log("Switch Hit");
         SR.sprite = images[1]; //set button to appear hit
 
         SSRef.PerformAction(Target, true); // set the Action attached to the SwitchSystem to true

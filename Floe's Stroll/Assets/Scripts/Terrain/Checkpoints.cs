@@ -41,6 +41,11 @@ public class Checkpoints : MonoBehaviour
                 SR.sprite = Visuals[1];
             isPassed = true;
 
+
+            //if (isGoal)
+            //{
+            //    GameplayManager.GM.StageFinished = true;
+            //}
         }
     }
 }

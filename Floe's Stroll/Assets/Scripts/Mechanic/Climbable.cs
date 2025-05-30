@@ -32,7 +32,7 @@ public class Climbable : MonoBehaviour
         //if (collision.GetComponent<Being>())
         if (collision.tag == "Player")
         {
-            Debug.Log("Exited Platform");
+            //Debug.Log("Exited Platform");
             collision.transform.SetParent(null);
         }
     }

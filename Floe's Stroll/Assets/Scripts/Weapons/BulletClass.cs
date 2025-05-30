@@ -162,10 +162,15 @@ public class BulletClass : Hitbox
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //Debug.Log(collision.name);
+        //This is to prevent errors that could arise from the return-type bullets when they dont have a signature in the first frame.
+        if (!Signature) return;
 
         //Check for collision
-        if ((collision.tag == "Player" || collision.tag == "Enemy") && collision.name != Signature.name && collision.GetComponent<Being>().Squad != Squad)
+        if (
+            (collision.tag == "Player" || collision.tag == "Enemy") && 
+            (collision.name != Signature.name) && 
+            collision.GetComponent<Being>().Squad != Squad
+            )
         {
             //Debug.Log(GameplayManager.GM);
             //Debug.Log(SignatureNumber);
@@ -292,7 +297,7 @@ public class BulletClass : Hitbox
 
         //play Animation coroutine
 
-        //Debug.Log("Bullets Crashed");
+        Debug.Log("Bullets Crashed");
 
         //Dismount
         if (Rider)
