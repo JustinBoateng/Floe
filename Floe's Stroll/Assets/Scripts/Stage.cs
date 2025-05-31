@@ -7,7 +7,8 @@ public class Stage : MonoBehaviour
 
     [SerializeField] Checkpoints[] CheckpointReference;
 
-    
+    [SerializeField] Vector2[] CameraBoundaries;
+
     //Try playing around with spawning enemies 
     //[SerializeField] GameObject[] EnemySpawnpoints;
     //[SerializeField] GameObject[] Enemies;

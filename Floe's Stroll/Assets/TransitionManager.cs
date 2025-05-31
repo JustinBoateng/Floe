@@ -73,6 +73,11 @@ public class TransitionManager : MonoBehaviour
         {
             GameObject.Find("Theatre").GetComponent<CinemaManager>().SetFilm(currSceneindex);
         }
+        
+        if (SceneManager.GetActiveScene().name == "SampleScene" || SceneManager.GetActiveScene().name == "GameScene")
+        {
+            GameplayManager.GM.TurnOn();
+        }
     }
 
 
@@ -136,7 +141,18 @@ public class TransitionManager : MonoBehaviour
         {
             switch (Stage)
             {
-                case "Stage1":
+                case "SampleStage1":
+                    GameplayManager.GM.SetStage(1);
+                    SceneManager.LoadScene("SampleScene");
+                    break;
+
+                case "SampleStage2":
+                    GameplayManager.GM.SetStage(2);
+                    SceneManager.LoadScene("SampleScene");
+                    break;
+
+                case "SampleStage3":
+                    GameplayManager.GM.SetStage(3);
                     SceneManager.LoadScene("SampleScene");
                     break;
 

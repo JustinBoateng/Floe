@@ -8,6 +8,7 @@ public class Switch : MonoBehaviour
     [SerializeField] string Type;
     //Switch for switches that need to be hit
     //Sensor for when the trigger is activated by walking through it
+    //AutoMove for when a Cutscene is about to play
 
     [SerializeField] bool isHit;
     [SerializeField] bool isOneWay;
@@ -21,6 +22,8 @@ public class Switch : MonoBehaviour
     [SerializeField] string Target;
 
     [SerializeField] AutoMoveInstructions AMI;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -51,6 +54,8 @@ public class Switch : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if(collision.GetComponent<PlayerControl>())
+
         switch (Type) {
 
             case "Switch":
@@ -80,6 +85,7 @@ public class Switch : MonoBehaviour
             case "AutoMove":
                 //set the automove instructions attached to this switch to the collision.GetComponent<Player>().setAMI(a);
                 collision.GetComponent<PlayerControl>().setAMI(AMI);
+                collision.GetComponent<PlayerControl>().setVelocity(Vector2.zero);
                 bc.enabled = false;
                 break;
         }

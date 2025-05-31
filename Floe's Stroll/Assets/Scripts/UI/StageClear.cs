@@ -33,9 +33,13 @@ public class StageClear : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        resetPos();
+    }
+
+    public void resetPos()
+    {
         SCUILerpValue = 0;
         transform.position = Vector2.Lerp(OffScreenPosition.transform.position, OnScreenPosition.transform.position, SCUILerpValue);
-
         calcCooldown[1] = calcCooldown[0];
     }
 

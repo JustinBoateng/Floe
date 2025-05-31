@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    [SerializeField] public static CameraController CC;
+
     //Room Camera Movement
     [SerializeField] private float Speed;
     private float currentPosX;
@@ -23,10 +25,26 @@ public class CameraController : MonoBehaviour
 
     [SerializeField] private Transform[] BoundaryPoints;
 
+    [SerializeField] private float OriginalViewSize;
+    [SerializeField] private float ViewSize;
 
+
+    private void Awake()
+    {
+        if (CC == null)
+        {
+            DontDestroyOnLoad(this.gameObject);
+            //DontDestroyOnLoad(FadeScreen);
+            CC = this;
+        }
+
+        else if (CC != this)
+            Destroy(this.gameObject);
+    }
     private void Start()
     {
         BoundarySet();   
+        ResetViewSize();
     }
 
     void Update()
@@ -81,5 +99,24 @@ public class CameraController : MonoBehaviour
     public void disengageTarget()
     {
         Player = null;
+    }
+
+
+
+
+    public void ResetViewSize()
+    {
+        ViewSize = OriginalViewSize;
+        GetComponent<Camera>().orthographicSize = ViewSize;
+    }
+    public void setViewSize(float v)
+    {
+        ViewSize = v;
+        GetComponent<Camera>().orthographicSize = ViewSize;
+    }
+
+    public float getViewSize()
+    {
+        return ViewSize;
     }
 }

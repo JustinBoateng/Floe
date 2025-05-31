@@ -19,6 +19,8 @@ public class Blade : Hitbox
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
+        if(Signature)
         if ((collision.tag == "Player" || collision.tag == "Enemy") && collision.name != Signature.name)
         {
             //Debug.Log(GameplayManager.GM);
@@ -41,13 +43,13 @@ public class Blade : Hitbox
             if (collision.GetComponent<BulletClass>().Signature != Signature) //if the hitboxes come from different people
                 if (collision.GetComponent<BulletClass>().Power >= Power)
                 {
-                    Debug.Log("Bullet overpowered this weapon");
+                    //Debug.Log("Bullet overpowered this weapon");
                     Crash();
                 }
 
                 else
                 {
-                    Debug.Log("Weapon destroyed bullet");
+                    //Debug.Log("Weapon destroyed bullet");
                     collision.GetComponent<BulletClass>().Crash();
                 }
         }

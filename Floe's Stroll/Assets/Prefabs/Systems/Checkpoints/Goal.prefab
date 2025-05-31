@@ -304,6 +304,8 @@ MonoBehaviour:
   isGoal: 1
   bc: {fileID: 0}
   SR: {fileID: 4126924555786741289}
+  NextStage: SampleStage2
+  LoadLag: 6
 --- !u!61 &5679468153226991133
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -388,6 +388,7 @@
 "Assets/Scripts/Enemy Scripts/FootSoldierAI.cs"
 "Assets/Scripts/Enemy Scripts/MidairSoldier.cs"
 "Assets/Scripts/Enemy Scripts/Sight.cs"
+"Assets/Scripts/EnemyBatch.cs"
 "Assets/Scripts/Health.cs"
 "Assets/Scripts/InputScripts/PlayerControl.cs"
 "Assets/Scripts/InputScripts/PlayerInputHandler.cs"
@@ -417,6 +418,7 @@
 "Assets/Scripts/Weapons/Blade.cs"
 "Assets/Scripts/Weapons/BulletClass.cs"
 "Assets/Scripts/Weapons/Hitbox.cs"
+"Assets/SinglePlayerCanvas.cs"
 "Assets/TransitionManager.cs"
 -langversion:9.0
 /deterministic

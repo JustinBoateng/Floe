@@ -1,0 +1,158 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8030739488630260091
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 788772030960892107}
+  - component: {fileID: 5979949355262613244}
+  - component: {fileID: 9157023588931870457}
+  m_Layer: 0
+  m_Name: GameplayManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &788772030960892107
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8030739488630260091}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 4.681986, y: -1.6975765, z: -0.045413733}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5979949355262613244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8030739488630260091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 621567455fd1c4ceb811cc8a00b6a1a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_NotificationBehavior: 0
+  m_MaxPlayerCount: -1
+  m_AllowJoining: 0
+  m_JoinBehavior: 0
+  m_PlayerJoinedEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 9157023588931870457}
+        m_TargetAssemblyTypeName: GameplayManager, Assembly-CSharp
+        m_MethodName: NextPlayerSpawn
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  m_PlayerLeftEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_JoinAction:
+    m_UseReference: 0
+    m_Action:
+      m_Name: Join
+      m_Type: 0
+      m_ExpectedControlType: 
+      m_Id: ff18257a-216d-4f64-81ac-5b3b7fe308fc
+      m_Processors: 
+      m_Interactions: 
+      m_SingletonActionBindings: []
+      m_Flags: 0
+    m_Reference: {fileID: 0}
+  m_PlayerPrefab: {fileID: 9086889187658062657, guid: c49dfa20104d66448991f5e25b593697, type: 3}
+  m_SplitScreen: 0
+  m_MaintainAspectRatioInSplitScreen: 0
+  m_FixedNumberOfSplitScreens: -1
+  m_SplitScreenRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!114 &9157023588931870457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8030739488630260091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 829ca74b973a33e4cb3f0af4a1397111, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StageList:
+  - {fileID: 8249570422669027130, guid: 071f1b68d9e5d5d4a88a8badef2179b4, type: 3}
+  - {fileID: 2755901821792548523, guid: da684f7dac63581468796032d66e8012, type: 3}
+  currStage: 1
+  numPlayers: 1
+  CurrentMainPlayer: {fileID: 0}
+  PlayerPrefabs:
+  - {fileID: 725085189178136654, guid: c5b94937364cd504784eba0e0a64a02f, type: 3}
+  - {fileID: 2862382411574575853, guid: 02da6f9c7ff14c34285b47ad26038259, type: 3}
+  - {fileID: 4490251378957748879, guid: 2af374caa9007fe44b0a3a8e7bfab2f1, type: 3}
+  - {fileID: 185485108752466615, guid: 360c6c9b219e88e488122c99d9c0503d, type: 3}
+  currPF: 0
+  PIU: {fileID: 5979949355262613244}
+  PlayerInputs: []
+  CameraCont: {fileID: 0}
+  CameraFocus: {fileID: 0}
+  MainCharacter: {fileID: 0}
+  ViewSize: 10
+  Score: 000000000000000000000000
+  Players:
+  - {fileID: 0}
+  - {fileID: 0}
+  Winner: 0
+  PlayerHealth:
+  - {fileID: 0}
+  - {fileID: 0}
+  PlayerHealthBars:
+  - {fileID: 0}
+  - {fileID: 0}
+  Timer:
+  - 2
+  - 0
+  - 0
+  - 0
+  CollectRef: {fileID: 0}
+  Checkpoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  FurthestCheckpoint: 0
+  StageFinished: 0
+  StageFinishedEndlag:
+  - 3
+  - 0
+  StageClearUI: {fileID: 0}
+  SCUILerpValue: {fileID: 0}
+  TimeCountUp: 1
+  GameOn: 1
+  PauseOn: 0
+  UIPanel: {fileID: 0}
+  ResumeButton: {fileID: 0}

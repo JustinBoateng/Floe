@@ -9,7 +9,8 @@ public class SwitchSystem : MonoBehaviour
     //Trigger (like, reaching a certain area wil trigger some event)
     //Solution (system activates when a condition is met, say, if all the enemies in an area are defeated)
 
-    [SerializeField] bool switchstate;
+
+    //[SerializeField] bool switchstate;
     [SerializeField] bool isOneWay;
 
     [SerializeField] Switch S;
@@ -23,7 +24,7 @@ public class SwitchSystem : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        switchstate = false;
+        //switchstate = false;
     }
 
     // Update is called once per frame
@@ -32,21 +33,16 @@ public class SwitchSystem : MonoBehaviour
         
     }
 
-    /*
-    public void FlipState(string s = "")
-    {
-        if (!isOneWay) { 
-            switchstate = true;
-            PerformAction();
-        }
-        else { switchstate = !switchstate; PerformAction(s, switchstate); }
-    }
-    */
+
     public void PerformAction(string s = "", bool state = true)
     {
         switch (s)
         {
-            case "MovingTerrain":
+            case "SomeOtherThing":
+                break;
+
+            //MovingTerrain Case
+            default:
                 if (state)
                     foreach (MovingTerrain t in MT) { 
                     t.TerrainActivate(1);

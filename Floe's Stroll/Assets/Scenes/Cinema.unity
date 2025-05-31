@@ -789,7 +789,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FilmDictionary:
   - {fileID: 32900000, guid: dfe780101215166479e189555132951d, type: 3}
-  - {fileID: 32900000, guid: ed02216c3e41eb046bc7a29232ca0120, type: 3}
+  - {fileID: 32900000, guid: dfe780101215166479e189555132951d, type: 3}
   currFilm: 0
   Theatre: {fileID: 1153476198}
 --- !u!1 &1332010733

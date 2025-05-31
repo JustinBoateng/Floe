@@ -13,13 +13,16 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] int currStage;
 
     [SerializeField] int numPlayers;
+    [SerializeField] GameObject CurrentMainPlayer;
     [SerializeField] GameObject[] PlayerPrefabs;
+
+
     [SerializeField] int currPF = 0;
     [SerializeField] PlayerInputManager PIU;
     [SerializeField] PlayerInput[] PlayerInputs;
     [SerializeField] public CameraController CameraCont;
-    [SerializeField] Transform CameraFocus;
-    [SerializeField] Transform MainCharacter;
+    //[SerializeField] Transform CameraFocus;
+    //[SerializeField] Transform MainCharacter;
 
     [SerializeField] float ViewSize;
     //[SerializeField] float currTime;
@@ -45,8 +48,7 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] GameObject SCUILerpValue;
 
 
-    [SerializeField] GameObject CurrentMainPlayer;
-
+    //[SerializeField] GameObject CMPPrefab;
 
     [SerializeField] public bool TimeCountUp = true; //true for TimeCalcUp, false for TimeCalcDown
     [SerializeField] public bool GameOn = true;
@@ -72,9 +74,9 @@ public class GameplayManager : MonoBehaviour
     {
         //if(CameraCont == null)
         //    CameraCont = GameObject.Find("Camera").GetComponent<CameraController>();
-
+        Debug.Log("Start Function Activated");
         TurnOn();
-
+        /*
         if (numPlayers <= 1)
         {
             //Debug.Log("Singleplayer Mode");
@@ -85,10 +87,12 @@ public class GameplayManager : MonoBehaviour
             //Debug.Log("Multiplayer Mode");
             CameraCont.setTarget(CameraFocus);
             CameraCont.setAhead(0);
-            CameraCont.GetComponent<Camera>().orthographicSize = ViewSize;
-        }
 
-        PIU.playerPrefab = PlayerPrefabs[currPF];
+            CameraCont.setViewSize(ViewSize);
+        }
+        */
+        
+        //PIU.playerPrefab = PlayerPrefabs[currPF];
 
         //PlayerHealth[0] = Players[0].GetComponent<Health>();
         //PlayerHealth[1] = Players[1].GetComponent<Health>();
@@ -96,7 +100,7 @@ public class GameplayManager : MonoBehaviour
         //PlayerHealthBars[1].setHealth(PlayerHealth[1]);
 
 
-        PlacePlayer();
+        //PlacePlayer();
 
     }
 
@@ -137,7 +141,7 @@ public class GameplayManager : MonoBehaviour
             currPF = 0;
 
         
-        PIU.playerPrefab = PlayerPrefabs[currPF];
+        //PIU.playerPrefab = PlayerPrefabs[currPF];
 
     }
 
@@ -175,7 +179,9 @@ public class GameplayManager : MonoBehaviour
     {
         //if (Timer[3] <= 0)
 
-        if ((int)(Timer[3]) > (int)(Timer[3] + UnityEngine.Time.deltaTime) || Timer[3] <= 0)
+        //if ((int)(Timer[3]) > (int)(Timer[3] + UnityEngine.Time.deltaTime) || Timer[3] <= 0)
+
+        if (Timer[3] < 0.01)
         {
             if (Timer[2] < 0)
             {
@@ -216,28 +222,47 @@ public class GameplayManager : MonoBehaviour
         }
 
         ClockRef.ClockUpdate(Timer[1], Timer[2], Timer[3]);
+
+        //Clock.ClockInstance.ClockUpdate(Timer[1], Timer[2], Timer[3]);
     }
 
     private void TimeCalcUp()
     {
         //if (Timer[3] <= 0)
 
-        if ((int)(Timer[3]) < (int)(Timer[3] + UnityEngine.Time.deltaTime) || Timer[3] >= 60)
+        
+        //if milliseconds truncated is less than milliseconds plus change in time truncated
+        //Meaning that if the timer is about to go over to the next number, you go to the next second
+        //if (
+        //    (int)(Timer[3]) < (int)(Timer[3] + UnityEngine.Time.deltaTime) 
+        //    || Timer[3] >= 60
+        //   )
+
+        //Timer[3] contains the deltaTime, so the summation should be less than 1, usually. 
+        //Make it > 0.98 so that you don't accidentally include 1.00 in the millisecond timer
+        if (Timer[3] > 0.98)
         {
-            if (Timer[2] > 59)
+            if (Timer[2] >= 59)
             {
+                Debug.Log("First if statement reached");
+
                 if (Timer[1] >= Timer[0])
                 {
+                   //.Debug.Log("Point A");
                     GameOn = false;
                     Timer[2] = 59;
                     Timer[1] = 59;
                 }
 
-                else Timer[1] += 1;
+                else {
+                    //Debug.Log("Point B");
+                    Timer[1] += 1; 
+                }
 
 
                 if (GameOn)
                 {
+                    //Debug.Log("Point C");
                     Timer[2] = 0;
                 }
 
@@ -245,8 +270,12 @@ public class GameplayManager : MonoBehaviour
 
             else
             {
+                //Debug.Log("Point D");
                 if (GameOn)
+                {
+                    //Debug.Log("Point E");
                     Timer[2] += 1;
+                }
             }
 
             if (GameOn)
@@ -265,6 +294,8 @@ public class GameplayManager : MonoBehaviour
         }
 
         ClockRef.ClockUpdate(Timer[1], Timer[2], Timer[3]);
+        //GameObject.Find("ClockObject").GetComponent<Clock>().ClockUpdate(Timer[1], Timer[2], Timer[3]);
+        //Clock.ClockInstance.ClockUpdate(Timer[1], Timer[2], Timer[3]);
     }
 
     private void SinglePlayerScoreCalc()
@@ -286,10 +317,10 @@ public class GameplayManager : MonoBehaviour
     {
         FurthestCheckpoint = Mathf.Max(FurthestCheckpoint, n);
 
-        if (Checkpoints[FurthestCheckpoint].isGoal)
-        {
-            StageFinished = true;
-        }
+        //if (Checkpoints[FurthestCheckpoint].isGoal)
+        //{
+        //    StageFinished = true;
+        //}
     }
 
     public void PlacePlayer()
@@ -300,7 +331,11 @@ public class GameplayManager : MonoBehaviour
 
     public void TurnOn()
     {
-        if(TimeCountUp) Timer[1] = 0;
+        Debug.Log("TurnOn Function Activated");
+
+        ClockRef = GameObject.Find("ClockObject").GetComponent<Clock>();
+
+        if (TimeCountUp) Timer[1] = 0;
         else Timer[1] = Timer[0];
 
         StageFinished = false;
@@ -313,6 +348,12 @@ public class GameplayManager : MonoBehaviour
         Instantiate(StageList[currStage]);
         Checkpoints = StageList[currStage].GetCheckpoints();
 
+        if (!CurrentMainPlayer)
+        {
+            CurrentMainPlayer = Instantiate(PlayerPrefabs[0]);
+            CameraController.CC.setTarget(CurrentMainPlayer.transform);
+            PlacePlayer();
+        }
 
     }
 
@@ -321,6 +362,25 @@ public class GameplayManager : MonoBehaviour
         currStage = i;
     }
 
+    public void LoadStage(string s)
+    {
+        //StartCoroutine(LoadTransition(5f, s));
+
+    }
+
+    public IEnumerator LoadTransition(float LoadTime, string nextStage)
+    {
+        yield return new WaitForSeconds(LoadTime);
+
+        StageFinished = false;
+        StageClearUI.resetPos();
+
+        PauseOn = true;
+        PauseButton();
+
+        TransitionManager.TM.MoveScene(nextStage);
+
+    }
     public void PauseButton()
     {
         if (!StageFinished)
@@ -336,5 +396,10 @@ public class GameplayManager : MonoBehaviour
 
             EventSystem.current.SetSelectedGameObject(ResumeButton.gameObject);
         }
+    }
+
+    public PlayerControl GetPlayer()
+    {
+        return CurrentMainPlayer.GetComponent<PlayerControl>();
     }
 }

@@ -256,7 +256,7 @@ public class PlayerControl : Being
             case "Vault":
                 ResetStates("Vault");
                 //isVaulting = true;
-                Debug.Log("Vault Activated");
+                //Debug.Log("Vault Activated");
 
                 isVaulting[1] = isVaulting[0];
                 isVaulting[2] = 1; //isVaulting = true
@@ -852,12 +852,12 @@ public class PlayerControl : Being
         */
         if (context.canceled && isHurt[1] == 0) //We can shoot because we are not hurt
         {
-            if (GetAmmo() > 0)
+            //if (GetAmmo() > 0)
             {
 
                 currentBullet = (int) ChargeFactor[1];
 
-                AmmoCalc(-1);
+                //AmmoCalc(-1);
                 CooldownStart("Shoot");
 
 

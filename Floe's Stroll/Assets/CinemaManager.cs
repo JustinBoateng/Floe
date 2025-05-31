@@ -9,6 +9,7 @@ public class CinemaManager : MonoBehaviour
 
     [SerializeField] VideoClip[] FilmDictionary;
     [SerializeField] int currFilm = 0;
+    [SerializeField] string nextStage = "SampleStage1";
     [SerializeField] VideoPlayer Theatre;
 
     // Start is called before the first frame update
@@ -31,7 +32,7 @@ public class CinemaManager : MonoBehaviour
 
 
         if(TransitionManager.TM.getStage() == "NewFile");
-        TransitionManager.TM.MoveScene("Stage1");
+        TransitionManager.TM.MoveScene(nextStage);
     }
 
     public void SetFilm(int i)

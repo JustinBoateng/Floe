@@ -91,6 +91,7 @@ public class FootSoldierAI : EnemyAI
                 break;
             case "Chase":
                 
+                if(transform)
                 if (Target.transform.position.x < transform.position.x)
                 {
                     facing[0] = -1;

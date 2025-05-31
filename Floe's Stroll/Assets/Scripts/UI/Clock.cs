@@ -5,11 +5,25 @@ using UnityEngine;
 
 public class Clock : MonoBehaviour
 {
+    [SerializeField] public static Clock ClockInstance;
 
     [SerializeField] TextMeshProUGUI Minutes;
     [SerializeField] TextMeshProUGUI Seconds;
     [SerializeField] TextMeshProUGUI Milliseconds;
     [SerializeField] float msSpecification;
+
+    private void Awake()
+    {
+        if (ClockInstance == null)
+        {
+            DontDestroyOnLoad(this.gameObject);
+            //DontDestroyOnLoad(FadeScreen);
+            ClockInstance = this;
+        }
+
+        else if (ClockInstance != this)
+            Destroy(this.gameObject);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -25,7 +39,8 @@ public class Clock : MonoBehaviour
 
     public void ClockUpdate(float m, float s, float ms)
     {
-        msSpecification = (int) (ms * 100) % 100;
+        //Debug.Log(ms);
+        msSpecification = (int)(ms * 100);// % 100;
 
         Minutes.text = m.ToString();
 

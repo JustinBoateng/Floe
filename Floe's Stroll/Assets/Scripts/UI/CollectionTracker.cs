@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class CollectionTracker : MonoBehaviour
 {
+    [SerializeField] public static CollectionTracker Instance;
+
     [SerializeField] TextMeshProUGUI CopperDisplay;
     [SerializeField] TextMeshProUGUI NickelDisplay;
     [SerializeField] TextMeshProUGUI CoinsDisplay;
@@ -12,6 +14,22 @@ public class CollectionTracker : MonoBehaviour
     [SerializeField] int CopperAmount = 0;
     [SerializeField] int NickelAmount = 0;
     [SerializeField] int CoinsAmount = 0;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            DontDestroyOnLoad(this.gameObject);
+            //DontDestroyOnLoad(FadeScreen);
+            Instance = this;
+        }
+
+        else if (Instance != this)
+            Destroy(this.gameObject);
+
+
+    }
+
     // Start is called before the first frame update
     void Start()
     {

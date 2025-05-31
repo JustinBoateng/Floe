@@ -10,6 +10,9 @@ public class Checkpoints : MonoBehaviour
     [SerializeField] public bool isPassed, isGoal;
     [SerializeField] BoxCollider2D bc;
     [SerializeField] SpriteRenderer SR;
+
+    [SerializeField] string NextStage;
+    [SerializeField] float LoadLag = 6f;
     
     
 
@@ -42,10 +45,14 @@ public class Checkpoints : MonoBehaviour
             isPassed = true;
 
 
-            //if (isGoal)
-            //{
-            //    GameplayManager.GM.StageFinished = true;
-            //}
+            if (isGoal)
+            {
+                GameplayManager.GM.StageFinished = true;
+                GameplayManager.GM.GetPlayer().setVelocity(Vector2.zero);
+
+                GameplayManager.GM.StartCoroutine(GameplayManager.GM.LoadTransition(LoadLag, NextStage));
+                //GameplayManager.GM.LoadStage(NextStage);
+            }
         }
     }
 }
