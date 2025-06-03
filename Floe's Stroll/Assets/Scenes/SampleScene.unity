@@ -1237,6 +1237,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91c0b0d0d639e8444bdf965ddfbe2b06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PauseMenu: {fileID: 634141826}
+  StageClearUI: {fileID: 1486325797}
 --- !u!1 &454726952
 GameObject:
   m_ObjectHideFlags: 0
