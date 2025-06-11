@@ -890,7 +890,8 @@ public class PlayerControl : Being
 
     public void onPause(InputAction.CallbackContext context)
     {
-        if (UnpauseBuffer[1] > 0 || GameplayManager.GM.StageFinished) return;
+        //if(!GameplayManager.GM.PauseOn)
+        if ((UnpauseBuffer[1] > 0 || GameplayManager.GM.StageFinished) && !GameplayManager.GM.PauseOn) return;
 
         if (context.started)
         {

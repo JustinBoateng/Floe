@@ -414,7 +414,7 @@ MonoBehaviour:
   AMTimer: 0
   AMI: {fileID: 0}
   UnpauseBuffer:
-  - 0.001
+  - 0.01
   - 0
 --- !u!114 &3062012590821813577
 MonoBehaviour:

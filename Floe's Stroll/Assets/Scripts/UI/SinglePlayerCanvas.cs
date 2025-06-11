@@ -8,7 +8,7 @@ public class SinglePlayerCanvas : MonoBehaviour
 
     [SerializeField] GameObject PauseMenu;
     [SerializeField] StageClear StageClearUI;
-
+    [SerializeField] HealthBar HealthBarUI;
     private void Awake()
     {
         if (Instance == null)
@@ -42,5 +42,10 @@ public class SinglePlayerCanvas : MonoBehaviour
 
     public StageClear getStageClearUI() { 
         return StageClearUI;
+    }
+
+    public void ConnectPlayertoPlayerHealth(Health p)
+    {
+        HealthBarUI.setHealth(p);
     }
 }

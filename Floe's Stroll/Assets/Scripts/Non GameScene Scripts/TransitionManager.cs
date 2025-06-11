@@ -76,7 +76,7 @@ public class TransitionManager : MonoBehaviour
         
         if (SceneManager.GetActiveScene().name == "SampleScene" || SceneManager.GetActiveScene().name == "GameScene")
         {
-            //GameplayManager.GM.TurnOn();
+            GameplayManager.GM.TurnOn();
         }
     }
 

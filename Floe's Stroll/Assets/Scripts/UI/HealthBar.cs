@@ -36,7 +36,7 @@ public class HealthBar : MonoBehaviour
         else gameObject.SetActive(true);
 
         if (playerHealth) 
-            currHealthBar.fillAmount = playerHealth.currentHealth / 10;
+            currHealthBar.fillAmount = playerHealth.currentHealth / playerHealth.StartingHealth;
         //Fill Amount can be between 1 and 0
     }
 
@@ -44,6 +44,9 @@ public class HealthBar : MonoBehaviour
     public void setHealth(Health hRef)
     {
         playerHealth = hRef;
+        //Debug.Log("Current Health Fill: " + playerHealth.currentHealth / playerHealth.StartingHealth);
         totalHealthBar.fillAmount = playerHealth.currentHealth / playerHealth.StartingHealth;
     }
+
+
 }

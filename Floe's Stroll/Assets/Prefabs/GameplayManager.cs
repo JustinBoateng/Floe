@@ -10,6 +10,7 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] public static GameplayManager GM;
 
     [SerializeField] Stage[] StageList;
+    [SerializeField] string nextStage;
     [SerializeField] int currStage;
 
     [SerializeField] int numPlayers;
@@ -219,20 +220,32 @@ public class GameplayManager : MonoBehaviour
     #endregion
 
     #region Loading Game Functions
-    public IEnumerator LoadTransition(float LoadTime, string nextStage)
+    public IEnumerator LoadTransition(float LoadTime, string nS)
     {
+        nextStage = nS;
+
         yield return new WaitForSeconds(LoadTime);
 
-        StageFinished = false;
-        StageClearUI.resetPos();
-
-        PauseOn = true;
-        PauseButton();
+        ResetVariables();
 
         TransitionManager.TM.MoveScene(nextStage);
 
     }
 
+    public void ResetVariables()
+    {
+        StageFinished = false;
+        StageFinishedEndlag[1] = StageFinishedEndlag[0];
+        StageClearUI.resetPos();
+
+        if (TimeCountUp) Timer[1] = 0;
+        else Timer[1] = Timer[0];
+        Timer[2] = Timer[3] = 0;
+
+
+        PauseOn = true;
+        PauseButton();
+    }
     public void TurnOn()
     {
         Debug.Log("TurnOn Function Activated");
@@ -251,6 +264,7 @@ public class GameplayManager : MonoBehaviour
         if(!PauseUIPanel) PauseUIPanel = SinglePlayerCanvas.Instance.getPauseMenu();
         PauseButton();
 
+        Debug.Log("Spawning Stage");
         Instantiate(StageList[currStage]);
         Checkpoints = StageList[currStage].GetCheckpoints();
 
@@ -261,7 +275,14 @@ public class GameplayManager : MonoBehaviour
             CurrentMainPlayer = Instantiate(PlayerPrefabs[0]);
             CameraController.CC.setTarget(CurrentMainPlayer.transform);
             PlacePlayer();
+            SinglePlayerCanvas.Instance.ConnectPlayertoPlayerHealth(
+                CurrentMainPlayer.GetComponent<Health>()
+                );
         }
+
+        SinglePlayerCanvas.Instance.ConnectPlayertoPlayerHealth(
+            CurrentMainPlayer.GetComponent<Health>()
+            );
 
     }
     public void SetStage(int i)

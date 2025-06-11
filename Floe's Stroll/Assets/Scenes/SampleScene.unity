@@ -1239,6 +1239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PauseMenu: {fileID: 634141826}
   StageClearUI: {fileID: 1486325797}
+  HealthBarUI: {fileID: 1245439861}
 --- !u!1 &454726952
 GameObject:
   m_ObjectHideFlags: 0
@@ -6431,7 +6432,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 9157023588931870457, guid: bfb5e4b3ba3b73542a4e68022b5084f8, type: 3}
+      propertyPath: StageList.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 9157023588931870457, guid: bfb5e4b3ba3b73542a4e68022b5084f8, type: 3}
       propertyPath: StageList.Array.data[1]
+      value: 
+      objectReference: {fileID: 8249570422669027130, guid: 071f1b68d9e5d5d4a88a8badef2179b4, type: 3}
+    - target: {fileID: 9157023588931870457, guid: bfb5e4b3ba3b73542a4e68022b5084f8, type: 3}
+      propertyPath: StageList.Array.data[2]
       value: 
       objectReference: {fileID: 2755901821792548523, guid: da684f7dac63581468796032d66e8012, type: 3}
     - target: {fileID: 9157023588931870457, guid: bfb5e4b3ba3b73542a4e68022b5084f8, type: 3}

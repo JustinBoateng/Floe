@@ -54,7 +54,9 @@ public class Switch : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.GetComponent<PlayerControl>())
+        if(collision.tag == "Player" || 
+            (collision.tag == "Bullet" && 
+                collision.GetComponent<BulletClass>().Signature.name.Contains("Player") ))
 
         switch (Type) {
 
